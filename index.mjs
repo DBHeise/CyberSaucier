@@ -33,7 +33,7 @@ server.route({
         var input = request.payload
         return new Promise((resolve, reject) => {
             let recipies = [];            
-            for (let field in list) {  recipies.push(field) }
+            for (let field in list) { recipies.push(field) }
             let ovens = recipies.map((name) => {
                 return cChef.bake(input, list[name]).then((baked) => {
                     return {
@@ -70,7 +70,7 @@ server.route({
     }
 })
 
-
+//Retrieves the list of recipe names
 server.route({
     method: "GET",
     path: "/recipes",
@@ -82,6 +82,8 @@ server.route({
         return ary;
     }
 })
+
+//Retrieves the specified recipe 
 server.route({
     method: "GET",
     path: "/recipes/{name}",
@@ -97,6 +99,7 @@ server.route({
     }
 })
 
+//Read all JSON files from the specified folder
 const loadRecipes = async (folder) => {
     fs.readdir(folder, (err, files) => {
         files.forEach(file => {
@@ -112,12 +115,14 @@ const loadRecipes = async (folder) => {
 
 const init = async () => {
     const recipeFolder = path.resolve(config.RecipeFolder);
+
     try {
         fs.accessSync(recipeFolder, fs.constants.R_OK);
     } catch (err) {
-        //does not exist
+        //if the repo does not exist, clone it now
         await git('.').clone(config.RecipeGit, recipeFolder);
     }
+
     await git(recipeFolder).pull()
     await loadRecipes(recipeFolder)
     await server.register(inert);
