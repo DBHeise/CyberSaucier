@@ -14,7 +14,8 @@
   },
   "dependencies": {
     "cyberchef": "^8.22.0",
-    "hapi": "^17.8.1"
+    "hapi": "^17.8.1",
+    "inert": "^5.1.2"
   },
   "main": "index.mjs",
   "scripts": {
