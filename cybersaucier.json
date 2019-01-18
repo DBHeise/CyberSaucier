@@ -1,0 +1,7 @@
+{
+    "Port": 7000,
+    "ListenIP": "0.0.0.0",
+    "DefaultFile": "cyberchef.htm",
+    "RecipeFolder": "./recipes",
+    "RecipeGit": "https://github.com/DBHeise/CyberChefRecipes.git"
+}

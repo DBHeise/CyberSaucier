@@ -1,8 +1,9 @@
 
 FROM node:current-alpine
-
+RUN apk update && apk upgrade
+RUN apk add --no-cache git openssh
 WORKDIR /cybersaucier
-COPY package*.json ./
+COPY *.json ./
 RUN npm install
 COPY *.mjs ./
 COPY *.htm ./

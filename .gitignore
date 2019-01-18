@@ -1,4 +1,5 @@
 node_modules
+recipes
 npm-debug.log
 travis.log
 build

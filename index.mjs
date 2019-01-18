@@ -1,40 +1,125 @@
 'use strict';
 
+import fs from 'fs';
+import path from 'path';
 import Hapi from 'hapi';
 import inert from 'inert';
 import cChef from 'cyberchef/src/node/index';
+import git from 'simple-git';
+import config from './cybersaucier.json';
+
 
 const server = Hapi.server({
-    port: 7000,
-    host: '0.0.0.0'
+    port: config.Port,
+    host: config.ListenIP
 });
 
+let list = {}
+
+//Default Route - standard CyberChef page
 server.route({
     method: 'GET',
     path: '/',
     handler: (request, h) => {
-       return h.file("cyberchef.htm")
+        return h.file(config.DefaultFile)
     }
 });
 
-
+//POST - runs the request body as a payload against ALL recipies
 server.route({
-    method:"POST",
+    method: "POST",
     path: "/",
     handler: (request, h) => {
         var input = request.payload
-        //const recipie =  [{"op":"Split","args":["%u",""]},{"op":"From Hex","args":["Auto"]},{"op":"Swap endianness","args":["Raw",2,true]}];
-        const recipie = [{"op":"From Base64", "args": ["A-Za-z0-9+/=",true]}, {"op":"Decode text", "args":["UTF16LE (1200"]}];
         return new Promise((resolve, reject) => {
-            cChef.bake(input, recipie).then (r => {            
-                resolve(r.result);
-            })    
-        })
+            let recipies = [];            
+            for (let field in list) {  recipies.push(field) }
+            let ovens = recipies.map((name) => {
+                return cChef.bake(input, list[name]).then((baked) => {
+                    return {
+                        'recipeName': name,
+                        'result' : baked.result
+                    }
+                })
+            })
+            Promise.all(ovens).then((results) => {
+                resolve(results);
+            }).catch(reject);
+        })        
+    }
+})
+
+//POST - runs the request body against the specified recipe
+server.route({
+    method: "POST",
+    path: "/{name}",
+    handler: (request, h) => {
+        var input = request.payload
+        const recipe = list[request.params.name];
+        if (typeof recipe === "undefined" || recipe === null || recipe === "") {
+            let r = h.response('Invalid recipe name');
+            r.statusCode = 406;
+            return r
+        } else {
+            return new Promise((resolve, reject) => {
+                cChef.bake(input, recipe).then(r => {
+                    resolve(r.result);
+                })
+            })
+        }
     }
 })
 
 
-const init = async() => {
+server.route({
+    method: "GET",
+    path: "/recipes",
+    handler: (request, h) => {
+        let ary = [];
+        for (let field in list) {
+            ary.push(field)
+        }
+        return ary;
+    }
+})
+server.route({
+    method: "GET",
+    path: "/recipes/{name}",
+    handler: (request, h) => {
+        let recipe = list[request.params.name];
+        if (typeof recipe === "undefined" || recipe === null || recipe === "") {
+            let r = h.response('Invalid recipe name');
+            r.statusCode = 406;
+            return r;
+        } else {
+            return recipe;
+        }
+    }
+})
+
+const loadRecipes = async (folder) => {
+    fs.readdir(folder, (err, files) => {
+        files.forEach(file => {
+            if (file.endsWith('.json')) {
+                let fullPath = path.join(folder, file)
+                let content = fs.readFileSync(fullPath);
+                let j = JSON.parse(content);
+                list[j.name] = j.recipe
+            }
+        })
+    })
+}
+
+const init = async () => {
+    const recipeFolder = path.resolve(config.RecipeFolder);
+    try {
+        fs.accessSync(recipeFolder, fs.constants.R_OK);
+    } catch (err) {
+        //does not exist
+        await git('.').clone(config.RecipeGit, recipeFolder);
+    }
+    await git(recipeFolder).pull()
+    await loadRecipes(recipeFolder)
     await server.register(inert);
     await server.start();
     console.log(`Server running at: ${server.info.uri}`);
