@@ -1,6 +1,7 @@
 'use strict';
 
 import Hapi from 'hapi';
+import inert from 'inert';
 import cChef from 'cyberchef/src/node/index';
 
 const server = Hapi.server({
@@ -12,7 +13,7 @@ server.route({
     method: 'GET',
     path: '/',
     handler: (request, h) => {
-       h.file("cyberchef.htm")
+       return h.file("cyberchef.htm")
     }
 });
 
@@ -32,29 +33,9 @@ server.route({
     }
 })
 
-server.route({
-    method: "GET",
-    path: "/recipies",
-    handler: (request, h) => {}
-})
-server.route({
-    method: "GET",
-    path: "/recipies/:name",
-    handler: (request, h) => {}
-})
-server.route({
-    method: "POST",
-    path: "/recipies/:name",
-    handler: (request, h) => {}
-})
-server.route({
-    method: "DELETE",
-    path: "/recipies/:name",
-    handler: (request, h) => {}
-})
-
 
 const init = async() => {
+    await server.register(inert);
     await server.start();
     console.log(`Server running at: ${server.info.uri}`);
 };
