@@ -99,31 +99,66 @@ server.route({
     }
 })
 
-//Read all JSON files from the specified folder
-const loadRecipes = async (folder) => {
+//Read all JSON files from the specified folder (and subfolders)
+const loadRecipes = async (folder) => {    
     fs.readdir(folder, (err, files) => {
         files.forEach(file => {
-            if (file.endsWith('.json')) {
-                let fullPath = path.join(folder, file)
-                let content = fs.readFileSync(fullPath);
-                let j = JSON.parse(content);
-                list[j.name] = j.recipe
-            }
+            let fullPath = path.join(folder, file)
+            fs.stat(fullPath, (e, f) => {
+                if (f.isDirectory()) {
+                    loadRecipes(fullPath)
+                } else {
+                    if (file.endsWith('.json')) {
+                
+                        let content = fs.readFileSync(fullPath);
+                        let j = JSON.parse(content);
+                        list[j.name] = j.recipe
+                    }
+                }
+            })
         })
     })
 }
 
-const init = async () => {
-    const recipeFolder = path.resolve(config.RecipeFolder);
 
+const sparseRepo = async(localFolder, remoteGit, sparseFolder) => {
     try {
-        fs.accessSync(recipeFolder, fs.constants.R_OK);
+        fs.accessSync(localFolder, fs.constants.R_OK);
+        console.log(`Local git folder exists: ${localFolder}`)
     } catch (err) {
         //if the repo does not exist, clone it now
-        await git('.').clone(config.RecipeGit, recipeFolder);
+        console.log(`Setting up sparse checkout locally: ${localFolder}`)
+        await git('.').clone(remoteGit, localFolder, ["--no-checkout"])
+        let g = git(localFolder)
+        g.addConfig("core.sparsecheckout", "true")
+        fs.writeFileSync(path.join(localFolder, ".git/info/sparse-checkout"), sparseFolder)
     }
 
-    await git(recipeFolder).pull()
+    console.log(`Checkingout Latest`)
+    await git(localFolder).checkout("--")
+}
+
+const fullRepo = async(localFolder, remoteGit) => {
+    try {
+        fs.accessSync(localFolder, fs.constants.R_OK);
+        console.log(`Local git folder exists: ${localFolder}`)
+    } catch (err) {
+        //if the repo does not exist, clone it now
+        console.log(`Cloning repo locally: ${localFolder}`)
+        await git('.').clone(remoteGit, localFolder);
+    }
+
+    console.log(`Pulling Latest`)
+    await git(localFolder).pull()
+}
+
+const init = async () => {
+    const recipeFolder = path.resolve(config.RecipeFolder);
+    if (config.RecipeGitSparse && config.RecipeGitSparse.length > 0) {
+        await sparseRepo(recipeFolder, config.RecipeGit, config.RecipeGitSparse)
+    } else {
+        await fullRepo(recipeFolder, config.RecipeGit)
+    }
     await loadRecipes(recipeFolder)
     await server.register(inert);
     await server.start();
