@@ -156,7 +156,7 @@ const init = async () => {
 
     const recipeFolder = path.resolve(config.RecipeFolder);
 
-    if (config.config.RecipeGit) {
+    if (config.RecipeGit) {
         if (config.RecipeGitSparse && config.RecipeGitSparse.length > 0) {
             await sparseRepo(recipeFolder, config.RecipeGit, config.RecipeGitSparse)
         } else {
