@@ -25,16 +25,16 @@ server.route({
     }
 });
 
-//POST - runs the request body as a payload against ALL recipies
+//POST - runs the request body as a payload against ALL recipes
 server.route({
     method: "POST",
     path: "/",
     handler: (request, h) => {
         var input = request.payload
         return new Promise((resolve, reject) => {
-            let recipies = [];            
-            for (let field in list) { recipies.push(field) }
-            let ovens = recipies.map((name) => {
+            let recipes = [];            
+            for (let field in list) { recipes.push(field) }
+            let ovens = recipes.map((name) => {
                 return cChef.bake(input, list[name]).then((baked) => {
                     return {
                         'recipeName': name,
@@ -44,7 +44,7 @@ server.route({
             })
             Promise.all(ovens).then((results) => {
                 resolve(results);
-            }).catch(reject);
+            })
         })        
     }
 })

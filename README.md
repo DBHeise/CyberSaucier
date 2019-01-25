@@ -20,3 +20,18 @@ This is a wrapper around [CyberChef](https://github.com/gchq/CyberChef) to allow
 
 ## Docker image
 - available as a docker image, and on dockerhub: [crazydave42/cybersaucier](https://hub.docker.com/r/crazydave42/cybersaucier)
+
+
+## Configuration - cybersaucier.json
+    * Port
+        - port on which this will listen (if you change this, you should also make the same change in the Dockerfile)
+    * ListenIP
+        - IP Address on which to listen
+    * DefaultFile
+        - file to serve when someone does a basic GET
+    * RecipeFolder
+        - local folder to store recipes
+    * RecipeGit
+        - remote git repository where recipes live (can be empty)
+    * RecipeGitSparse
+        - Sparse getting (only pull the specific folder in the repo) (can be empty)
