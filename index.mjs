@@ -35,11 +35,18 @@ server.route({
             let recipes = [];            
             for (let field in list) { recipes.push(field) }
             let ovens = recipes.map((name) => {
-                return cChef.bake(input, list[name]).then((baked) => {
-                    return {
+                return cChef.bake(input, list[name].recipe).then((baked) => {
+                    let rObj= {
                         'recipeName': name,
                         'result' : baked.result
                     }
+                    //Add recipe meta data
+                    for (const key in list[name]["meta"]) {
+                        if (list[name]["meta"].hasOwnProperty(key)) {
+                            rObj[key] = list[name]["meta"][key];                            
+                        }
+                    }
+                    return rObj
                 })
             })
             Promise.all(ovens).then((results) => {
@@ -62,8 +69,18 @@ server.route({
             return r
         } else {
             return new Promise((resolve, reject) => {
-                cChef.bake(input, recipe).then(r => {
-                    resolve(r.result);
+                cChef.bake(input, recipe.recipe).then(r => {
+                    let rObj= {
+                        'recipeName': name,
+                        'result' : r.result
+                    }
+                    //Add recipe meta data
+                    for (const key in recipe["meta"]) {
+                        if (list[name]["meta"].hasOwnProperty(key)) {
+                            rObj[key] = recipe["meta"][key];                            
+                        }
+                    }
+                    return rObj
                 })
             })
         }
@@ -112,7 +129,7 @@ const loadRecipes = async (folder) => {
                 
                         let content = fs.readFileSync(fullPath);
                         let j = JSON.parse(content);
-                        list[j.name] = j.recipe
+                        list[j.name] = j
                     }
                 }
             })
