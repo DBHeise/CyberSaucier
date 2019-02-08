@@ -13,8 +13,8 @@
     "url": "https://github.com/dbheise/cybersaucier.git"
   },
   "dependencies": {
-    "cyberchef": "^8.22.0",
-    "hapi": "^18.0.0",
+    "cyberchef": "^8.24.0",
+    "hapi": "^18.1.0",
     "hapi-pino": "^5.4.0",
     "inert": "^5.1.2",
     "simple-git": "^1.107.0"

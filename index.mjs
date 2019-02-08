@@ -39,18 +39,23 @@ server.route({
             for (let field in list) { recipes.push(field) }
             let ovens = recipes.map((name) => {
                 return cChef.bake(input, list[name].recipe).then((baked) => {
-                    let rObj = {
-                        'recipeName': name,
-                        'result': baked.result
-                    }
-                    //Add recipe meta data
-                    for (const key in list[name]["meta"]) {
-                        if (list[name]["meta"].hasOwnProperty(key)) {
-                            rObj[key] = list[name]["meta"][key];
+                    let rObj = {}
+                    if (baked.error) {
+                        rObj['error'] = baked
+                    } else {
+                        rObj['recipeName'] = name
+                        rObj['result'] = baked.result
+
+                        //Add recipe meta data
+                        for (const key in list[name]["meta"]) {
+                            if (list[name]["meta"].hasOwnProperty(key)) {
+                                rObj[key] = list[name]["meta"][key];
+                            }
                         }
                     }
+
                     return rObj
-                }).catch(err => {                    
+                }).catch(err => {
                     return err
                 })
             })
@@ -189,15 +194,9 @@ const init = async () => {
     }
 
     await loadRecipes(recipeFolder);
-    
+
     await server.register(inert);
-    await server.register({
-        plugin: pino,
-        options: {
-            prettyPrint: true,
-            logEvents: ['response', 'onPostStart']
-        }
-    });
+    await server.register(pino);
 
     await server.start();
     console.log(`Server running at: ${server.info.uri}`);
@@ -211,7 +210,7 @@ process.on('unhandledRejection', (err) => {
 
 
 if (cluster.isMaster) {
-    let numCPUs = os.cpus().length;    
+    let numCPUs = os.cpus().length;
     let numThreads = numCPUs / 4;
     console.log(`CPU Count: ${numCPUs}, Thread Count: ${numThreads}`)
 
@@ -232,5 +231,5 @@ if (cluster.isMaster) {
     });
 
 } else {
-    init();    
+    init();
 }
