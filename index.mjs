@@ -1,9 +1,12 @@
 'use strict';
 
+import cluster from 'cluster';
+import os from 'os';
 import fs from 'fs';
 import path from 'path';
 import Hapi from 'hapi';
 import inert from 'inert';
+import pino from 'hapi-pino';
 import cChef from 'cyberchef/src/node/index';
 import git from 'simple-git';
 import config from './cybersaucier.json';
@@ -32,27 +35,29 @@ server.route({
     handler: (request, h) => {
         var input = request.payload
         return new Promise((resolve, reject) => {
-            let recipes = [];            
+            let recipes = [];
             for (let field in list) { recipes.push(field) }
             let ovens = recipes.map((name) => {
                 return cChef.bake(input, list[name].recipe).then((baked) => {
-                    let rObj= {
+                    let rObj = {
                         'recipeName': name,
-                        'result' : baked.result
+                        'result': baked.result
                     }
                     //Add recipe meta data
                     for (const key in list[name]["meta"]) {
                         if (list[name]["meta"].hasOwnProperty(key)) {
-                            rObj[key] = list[name]["meta"][key];                            
+                            rObj[key] = list[name]["meta"][key];
                         }
                     }
                     return rObj
+                }).catch(err => {                    
+                    return err
                 })
             })
             Promise.all(ovens).then((results) => {
                 resolve(results);
             })
-        })        
+        })
     }
 })
 
@@ -70,17 +75,19 @@ server.route({
         } else {
             return new Promise((resolve, reject) => {
                 cChef.bake(input, recipe.recipe).then(r => {
-                    let rObj= {
+                    let rObj = {
                         'recipeName': name,
-                        'result' : r.result
+                        'result': r.result
                     }
                     //Add recipe meta data
                     for (const key in recipe["meta"]) {
                         if (list[name]["meta"].hasOwnProperty(key)) {
-                            rObj[key] = recipe["meta"][key];                            
+                            rObj[key] = recipe["meta"][key];
                         }
                     }
                     return rObj
+                }).catch(err => {
+                    return err
                 })
             })
         }
@@ -117,7 +124,7 @@ server.route({
 })
 
 //Read all JSON files from the specified folder (and subfolders)
-const loadRecipes = async (folder) => {    
+const loadRecipes = async (folder) => {
     fs.readdir(folder, (err, files) => {
         files.forEach(file => {
             let fullPath = path.join(folder, file)
@@ -126,7 +133,7 @@ const loadRecipes = async (folder) => {
                     loadRecipes(fullPath)
                 } else {
                     if (file.endsWith('.json')) {
-                
+
                         let content = fs.readFileSync(fullPath);
                         let j = JSON.parse(content);
                         list[j.name] = j
@@ -138,7 +145,7 @@ const loadRecipes = async (folder) => {
 }
 
 
-const sparseRepo = async(localFolder, remoteGit, sparseFolder) => {
+const sparseRepo = async (localFolder, remoteGit, sparseFolder) => {
     try {
         fs.accessSync(localFolder, fs.constants.R_OK);
         console.log(`Local git folder exists: ${localFolder}`)
@@ -155,7 +162,7 @@ const sparseRepo = async(localFolder, remoteGit, sparseFolder) => {
     await git(localFolder).checkout("--")
 }
 
-const fullRepo = async(localFolder, remoteGit) => {
+const fullRepo = async (localFolder, remoteGit) => {
     try {
         fs.accessSync(localFolder, fs.constants.R_OK);
         console.log(`Local git folder exists: ${localFolder}`)
@@ -181,15 +188,49 @@ const init = async () => {
         }
     }
 
-    await loadRecipes(recipeFolder)
+    await loadRecipes(recipeFolder);
+    
     await server.register(inert);
+    await server.register({
+        plugin: pino,
+        options: {
+            prettyPrint: true,
+            logEvents: ['response', 'onPostStart']
+        }
+    });
+
     await server.start();
     console.log(`Server running at: ${server.info.uri}`);
-};
+
+}
 
 process.on('unhandledRejection', (err) => {
     console.log(err);
     process.exit(1);
 });
 
-init();
+
+if (cluster.isMaster) {
+    let numCPUs = os.cpus().length;    
+    let numThreads = numCPUs / 4;
+    console.log(`CPU Count: ${numCPUs}, Thread Count: ${numThreads}`)
+
+    cluster.on('online', (worker) => {
+        worker.on('message', msg => {
+            console.log(msg)
+        })
+    })
+
+    for (let i = 0; i < numThreads; i++) {
+        cluster.fork()
+    }
+
+
+    cluster.on('exit', (worker, code, signal) => {
+        console.log(`worker ${worker.process.pid} died, restarting`);
+        cluster.fork();
+    });
+
+} else {
+    init();    
+}
