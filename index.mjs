@@ -39,11 +39,10 @@ server.route({
             for (let field in list) { recipes.push(field) }
             let ovens = recipes.map((name) => {
                 return cChef.bake(input, list[name].recipe).then((baked) => {
-                    let rObj = {}
-                    if (baked.error) {
+                    let rObj = {'recipeName' : name}
+                    if (baked.error || baked.progress < 1) {
                         rObj['error'] = baked
-                    } else {
-                        rObj['recipeName'] = name
+                    } else {                        
                         rObj['result'] = baked.result
 
                         //Add recipe meta data
