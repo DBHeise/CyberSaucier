@@ -22,6 +22,9 @@
   "main": "index.mjs",
   "scripts": {
     "start": "node --experimental-modules index.mjs",
-    "test": "echo \"Error: no tests yet created!\""
+    "test": "node --experimental-modules test.mjs"
+  },
+  "devDependencies": {
+    "should": "^13.2.3"
   }
 }
