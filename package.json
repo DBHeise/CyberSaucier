@@ -19,12 +19,14 @@
     "inert": "^5.1.2",
     "simple-git": "^1.107.0"
   },
-  "main": "index.mjs",
+  "main": "main.mjs",
   "scripts": {
-    "start": "node --experimental-modules index.mjs",
+    "start": "node --experimental-modules main.mjs",
     "test": "node --experimental-modules test.mjs"
   },
   "devDependencies": {
-    "should": "^13.2.3"
+    "mocha": "^5.2.0",
+    "should": "^13.2.3",
+    "supertest": "^3.4.2"
   }
 }
