@@ -60,10 +60,15 @@ class Service {
     //POST - runs the request body as a payload against ALL recipes
     handlerAllRecipes(request, h) {
         let self = request.server.self;
+        let matcher = request.query["match"]
         let input = request.payload
         return new Promise((resolve, reject) => {
             let recipes = [];
-
+            for (let field in self.list) {
+                if (!matcher || (matcher && field.indexOf(matcher) > -1)) {
+                    recipes.push(field) 
+                }
+            }
             let ovens = recipes.map((name) => {
                 return cChef.bake(input, self.list[name].recipe).then((baked) => {
                     let rObj = { 'recipeName': name }
