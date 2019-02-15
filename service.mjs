@@ -1,6 +1,7 @@
 'use strict';
 
 import fs from 'fs';
+const fsPromises = fs.promises;
 import path from 'path';
 import Hapi from 'hapi';
 import inert from 'inert';
@@ -40,7 +41,7 @@ class Service {
 
         await this.loadRecipes(recipeFolder);
         await this.server.register(inert);
-        
+
         if (!(this.cfg.DisableLogging)) {
             await this.server.register(pino);
         }
@@ -57,37 +58,66 @@ class Service {
         return h.file(self.cfg.DefaultFile)
     }
 
+    filterRecipes(lst, nameMatch, fileMatch) {
+        let ans = []
+        for (let field in lst) {
+            if (nameMatch || fileMatch) {
+                if (nameMatch && fileMatch) {
+                    if (field.indexOf(nameMatch) > -1 && lst[field].filename.indexOf(fileMatch) > -1) {
+                        if (ans.indexOf(field) == -1) {
+                            ans.push(field)
+                        }
+                    }
+                } else {
+                    if (field.indexOf(nameMatch) > -1) {
+                        if (ans.indexOf(field) == -1) {
+                            ans.push(field)
+                        }
+                    }
+                    if (lst[field].filename.indexOf(fileMatch) > -1) {
+                        if (ans.indexOf(field) == -1) {
+                            ans.push(field)
+                        }
+                    }
+                }
+            } else {
+                ans.push(field)
+            }
+        }
+        return ans
+    }
+
+    handleCChefResults(baked, recipe) {
+        let rObj = { 'recipeName': recipe.name }
+        if (baked.error || baked.progress < 1) {
+            rObj['error'] = baked
+        } else {
+            rObj['result'] = baked.result
+
+            //Add recipe meta data
+            for (const key in recipe["meta"]) {
+                if (recipe["meta"].hasOwnProperty(key)) {
+                    rObj[key] = recipe["meta"][key];
+                }
+            }
+        }
+
+        return rObj
+    }
+
     //POST - runs the request body as a payload against ALL recipes
     handlerAllRecipes(request, h) {
         let self = request.server.self;
         let matcher = request.query["match"]
+        let file = request.query["file"]
         let input = request.payload
         return new Promise((resolve, reject) => {
-            let recipes = [];
-            for (let field in self.list) {
-                if (!matcher || (matcher && field.indexOf(matcher) > -1)) {
-                    recipes.push(field) 
-                }
-            }
+            let recipes = self.filterRecipes(self.list, matcher, file)
             let ovens = recipes.map((name) => {
                 return cChef.bake(input, self.list[name].recipe).then((baked) => {
-                    let rObj = { 'recipeName': name }
-                    if (baked.error || baked.progress < 1) {
-                        rObj['error'] = baked
-                    } else {
-                        rObj['result'] = baked.result
-
-                        //Add recipe meta data
-                        for (const key in self.list[name]["meta"]) {
-                            if (self.list[name]["meta"].hasOwnProperty(key)) {
-                                rObj[key] = self.list[name]["meta"][key];
-                            }
-                        }
-                    }
-
-                    return rObj
+                    return self.handleCChefResults(baked, self.list[name])
                 }).catch(err => {
-                    return err
+                    
                 })
             })
             Promise.all(ovens).then((results) => {
@@ -107,22 +137,10 @@ class Service {
             r.statusCode = 406;
             return r
         } else {
-            return new Promise((resolve, reject) => {
-                cChef.bake(input, recipe.recipe).then(r => {
-                    let rObj = {
-                        'recipeName': name,
-                        'result': r.result
-                    }
-                    //Add recipe meta data
-                    for (const key in recipe["meta"]) {
-                        if (self.list[name]["meta"].hasOwnProperty(key)) {
-                            rObj[key] = recipe["meta"][key];
-                        }
-                    }
-                    return rObj
-                }).catch(err => {
-                    return err
-                })
+            return cChef.bake(input, recipe.recipe).then(r => {
+                return self.handleCChefResults(r, recipe)
+            }).catch(err => {
+                
             })
         }
     }
@@ -152,23 +170,29 @@ class Service {
 
     //Read all JSON files from the specified folder (and subfolders)
     async loadRecipes(folder) {
-        fs.readdir(folder, (err, files) => {
-            files.forEach(file => {
-                let fullPath = path.join(folder, file)
-                fs.stat(fullPath, (e, f) => {
-                    if (f.isDirectory()) {
-                        this.loadRecipes(fullPath)
-                    } else {
-                        if (file.endsWith('.json')) {
-
-                            let content = fs.readFileSync(fullPath);
-                            let j = JSON.parse(content);
-                            this.list[j.name] = j
-                        }
+        let self = this
+        //console.log("Loading recipes from: " + folder);
+        try {
+            const names = await fsPromises.readdir(folder)
+            for (let i = 0; i < names.length; i++) {
+                let fullPath = path.join(folder, names[i])
+                const f = await fsPromises.stat(fullPath)
+                if (f.isDirectory()) {
+                    await self.loadRecipes(fullPath)
+                } else {
+                    if (names[i].endsWith(".json")) {
+                        //console.log("Loading Recipe: " + fullPath)
+                        let content = fs.readFileSync(fullPath);
+                        let j = JSON.parse(content);
+                        j.filename = names[i]
+                        j.fullpath = fullPath
+                        self.list[j.name] = j
                     }
-                })
-            })
-        })
+                }
+            }
+        } catch (err) {
+            console.error("Error occured while loading recipies", err);
+        }
     }
 
 

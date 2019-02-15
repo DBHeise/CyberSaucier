@@ -1,0 +1,11 @@
+{
+    "author": "me",
+    "createdOn": "2019-01-28T00:00:00.000Z",
+    "name": "Email Puller",
+    "description": "Email Puller",
+    "recipe": [{"op":"Regular expression","args":["Email address","\\b(\\w[-.\\w]*)@([-\\w]+(?:\\.[-\\w]+)*)\\.([A-Za-z]{2,4})\\b",true,true,false,false,false,false,"List matches"]}],
+    "meta": {
+        "test": "userdefined",
+        "fieldname": "Email"
+    }
+}

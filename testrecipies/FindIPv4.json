@@ -1,0 +1,12 @@
+{
+    "author": "me",
+    "createdOn": "2019-01-28T00:00:00.000Z",
+    "name": "IPv4 Puller",
+    "description": "IPv4 Puller",
+    "recipe": [{"op":"Regular expression","args":["IPv4 address","(?:(?:\\d|[01]?\\d\\d|2[0-4]\\d|25[0-5])\\.){3}(?:25[0-5]|2[0-4]\\d|[01]?\\d\\d|\\d)(?:\\/\\d{1,2})?",true,true,false,false,false,false,"List matches"]}],
+    "meta": {
+        "test": "userdefined",
+        "fieldname": "IPv4"
+    }
+
+}

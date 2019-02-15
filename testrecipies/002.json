@@ -1,0 +1,7 @@
+{
+    "author": "me",
+    "createdOn": "2019-02-14T00:00:00.000Z",
+    "name": "TestRecipe002",
+    "description": "a very simple from hex recipe",
+    "recipe": [{ "op": "From Hex", "args": ["Space"] }]
+}

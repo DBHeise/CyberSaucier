@@ -1,0 +1,11 @@
+{
+    "author": "me",
+    "createdOn": "2019-01-28T00:00:00.000Z",
+    "name": "URL Puller",
+    "description": "URL Puller",
+    "recipe": [{"op":"Regular expression","args":["User defined","(http|ftp|https)://([\\w_-]+(?:(?:\\.[\\w_-]+)+))([\\w.,@?^=%&:/~+#-]*[\\w@?^=%&/~+#-])?",true,true,false,false,false,false,"List matches"]}],
+    "meta": {
+        "test": "userdefined",
+        "fieldname": "URL"
+    }
+}

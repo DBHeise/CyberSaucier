@@ -1,0 +1,11 @@
+{
+    "author": "me",
+    "createdOn": "2019-02-15T00:00:00.000Z",
+    "name": "Test Recipe 004 - URL - complex",
+    "description": "a more complex recipe - pulling out URLs",
+    "recipe": [{"op":"From Base64","args":["A-Za-z0-9+/=",true]},{"op":"Gunzip","args":[]},{"op":"XOR","args":[{"option":"Hex","string":"abcde"},"Standard",false]},{"op":"From Base64","args":["A-Za-z0-9+/=",true]},{"op":"Regular expression","args":["URL","([A-Za-z]+://)([-\\w]+(?:\\.\\w[-\\w]*)+)(:\\d+)?(/[^.!,?\"<>\\[\\]{}\\s\\x7F-\\xFF]*(?:[.!,?]+[^.!,?\"<>\\[\\]{}\\s\\x7F-\\xFF]+)*)?",true,true,false,false,false,false,"List matches"]}],
+    "meta": {
+        "something": "user defined",
+        "fieldname": "Found"
+    }
+}
