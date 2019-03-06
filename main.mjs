@@ -82,7 +82,9 @@ if (cluster.isMaster) {
                     setTimeout(doGitCheck, config.GitInterval)    
                 })                                
             }
-            setTimeout(doGitCheck, config.GitInterval)
+            if (config.GitInterval > 0) {
+                setTimeout(doGitCheck, config.GitInterval)
+            }
         }
         gitrun(s)
     } else {

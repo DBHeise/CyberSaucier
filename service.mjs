@@ -248,7 +248,7 @@ class Service {
         }
 
         console.log(`Pulling Latest`)
-        await git(localFolder).pull()
+        await git(localFolder).silent(true).pull()
     }
 
 }
