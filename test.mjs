@@ -18,7 +18,7 @@ function testOptions() {
     }
 }
 
-
+////////////////// Cyber Chef Tests
 let cyberChefTestSuite = new Mocha.Suite("CyberChef Checks", new Mocha.Context())
 cyberChefTestSuite.addTest(new Mocha.Test("simple recipe check", () => {
     //Test #1
@@ -45,7 +45,7 @@ cyberChefTestSuite.addTest(new Mocha.Test("simple expected failure", () => {
 m.suite.addSuite(cyberChefTestSuite)
 
 
-
+////////////////// Internal Tests
 let internalTestSuite = new Mocha.Suite("Internal Test Suite", new Mocha.Context())
 internalTestSuite.addTest(new Mocha.Test("Service cTor", () => {
     let s = new Service()
@@ -103,7 +103,7 @@ internalTestSuite.addTest(new Mocha.Test("Service filterRecipes, match and file 
 m.suite.addSuite(internalTestSuite)
 
 
-
+////////////////// API Tests
 let apiTestSuite = new Mocha.Suite("API Test Suite", new Mocha.Context())
 apiTestSuite.addTest(new Mocha.Test("pull recipes", (done) => {
     (async (s) => {
@@ -219,7 +219,16 @@ apiTestSuite.addTest(new Mocha.Test("run a specific recipe", (done) => {
             })
     })(new Service(testOptions()))
 }))
-
 m.suite.addSuite(apiTestSuite)
+
+////////////////// Git Tests
+let gitTestSuite = new Mocha.Suit("Git Test Suite", new Mocha.Context())
+//TODO: local existing folder
+//TODO: remote git repo
+//TODO: git sparse repo
+//TODO: git update - new recipe
+//TODO: git update - removed recipe
+//TODO: git update - changed recipe
+m.suite.addSuite(gitTestSuite)
 
 m.run()

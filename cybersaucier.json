@@ -4,5 +4,6 @@
     "DefaultFile": "cyberchef.htm",
     "RecipeFolder": "./recipes",
     "RecipeGit": "https://github.com/DBHeise/CyberChefRecipes.git",
-    "RecipeGitSparse": "Subset/*"   
+    "RecipeGitSparse": "Simplified/*",
+    "GitInterval": 60000
 }

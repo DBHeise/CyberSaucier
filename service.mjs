@@ -20,6 +20,7 @@ class Service {
         })
         this.server.self = this
         this.list = {}
+        this.fileMap = {}
     }
 
     async Init() {
@@ -30,6 +31,14 @@ class Service {
         this.server.route({ method: "GET", path: "/recipes/{name}", handler: this.handlerListOneRecipe })
 
         const recipeFolder = path.resolve(this.cfg.RecipeFolder);
+        await this.server.register(inert);
+
+        if (!(this.cfg.DisableLogging)) {
+            await this.server.register(pino);
+        }
+    }
+    async InitGit() {
+        const recipeFolder = path.resolve(this.cfg.RecipeFolder);
 
         if (this.cfg.RecipeGit) {
             if (this.cfg.RecipeGitSparse && this.cfg.RecipeGitSparse.length > 0) {
@@ -38,18 +47,24 @@ class Service {
                 await this.setupFullRepo(recipeFolder, this.cfg.RecipeGit)
             }
         }
-
         await this.loadRecipes(recipeFolder);
-        await this.server.register(inert);
-
-        if (!(this.cfg.DisableLogging)) {
-            await this.server.register(pino);
-        }
     }
 
     async Start() {
         await this.server.start();
         console.log(`Server running at: ${this.server.info.uri}`);
+    }
+
+    UpdateRecipies(updateBlob) {
+        let self = this
+        const recipeFolder = path.resolve(self.cfg.RecipeFolder);        
+        if (updateBlob) {
+            let delta = updateBlob.files
+            for (let i = 0; i < delta.length; i++) {                
+                self.removeRecipe(path.resolve(recipeFolder, delta[i]))
+            }
+        }
+        self.loadRecipes(recipeFolder)
     }
 
     //Default Route - static configured file
@@ -117,7 +132,7 @@ class Service {
                 return cChef.bake(input, self.list[name].recipe).then((baked) => {
                     return self.handleCChefResults(baked, self.list[name])
                 }).catch(err => {
-                    
+
                 })
             })
             Promise.all(ovens).then((results) => {
@@ -140,7 +155,7 @@ class Service {
             return cChef.bake(input, recipe.recipe).then(r => {
                 return self.handleCChefResults(r, recipe)
             }).catch(err => {
-                
+
             })
         }
     }
@@ -168,10 +183,24 @@ class Service {
         }
     }
 
+    removeRecipe(fullPath) {
+        let name = this.fileMap[fullPath]
+        delete this.list[name];
+    }
+
+    loadRecipeFile(fullPath, fileName) {
+        console.log("Loading Recipe: " + fullPath)
+        let content = fs.readFileSync(fullPath);
+        let j = JSON.parse(content);
+        j.filename = fileName
+        j.fullpath = fullPath
+        this.list[j.name] = j
+        this.fileMap[fullPath] = j.name
+    }
+
     //Read all JSON files from the specified folder (and subfolders)
     async loadRecipes(folder) {
         let self = this
-        //console.log("Loading recipes from: " + folder);
         try {
             const names = await fsPromises.readdir(folder)
             for (let i = 0; i < names.length; i++) {
@@ -181,12 +210,7 @@ class Service {
                     await self.loadRecipes(fullPath)
                 } else {
                     if (names[i].endsWith(".json")) {
-                        //console.log("Loading Recipe: " + fullPath)
-                        let content = fs.readFileSync(fullPath);
-                        let j = JSON.parse(content);
-                        j.filename = names[i]
-                        j.fullpath = fullPath
-                        self.list[j.name] = j
+                        self.loadRecipeFile(fullPath, names[i])
                     }
                 }
             }
@@ -203,14 +227,14 @@ class Service {
         } catch (err) {
             //if the repo does not exist, clone it now
             console.log(`Setting up sparse checkout locally: ${localFolder}`)
-            await git('.').clone(remoteGit, localFolder, ["--no-checkout"])
+            await git('.').silent(true).clone(remoteGit, localFolder, ["--no-checkout"])
             let g = git(localFolder)
             g.addConfig("core.sparsecheckout", "true")
             fs.writeFileSync(path.join(localFolder, ".git/info/sparse-checkout"), sparseFolder)
         }
 
         console.log(`Checkingout Latest`)
-        await git(localFolder).checkout("--")
+        await git(localFolder).silent(true).checkout("--")
     }
 
     async setupFullRepo(localFolder, remoteGit) {
@@ -220,7 +244,7 @@ class Service {
         } catch (err) {
             //if the repo does not exist, clone it now
             console.log(`Cloning repo locally: ${localFolder}`)
-            await git('.').clone(remoteGit, localFolder);
+            await git('.').silent(true).clone(remoteGit, localFolder);
         }
 
         console.log(`Pulling Latest`)
