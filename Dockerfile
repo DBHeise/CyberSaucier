@@ -9,4 +9,4 @@ COPY cybersaucier.json ./
 COPY *.mjs ./
 COPY *.htm ./
 EXPOSE 7000
-CMD ["node", "--experimental-modules", "index.mjs"]
+CMD ["node", "--experimental-modules", "main.mjs"]
