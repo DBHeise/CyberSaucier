@@ -5,7 +5,7 @@ import os from 'os';
 import path from 'path';
 import Service from './service';
 import git from 'simple-git';
-import config from './cybersaucier.json';
+import config from './config';
 
 const MESSAGE_UPDATEDREPO = "UpdatedRepo"
 process.on('unhandledRejection', (err) => {

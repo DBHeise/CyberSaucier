@@ -8,7 +8,7 @@ import inert from 'inert';
 import pino from 'hapi-pino';
 import cChef from 'cyberchef/src/node/index';
 import git from 'simple-git';
-import config from './cybersaucier.json';
+import config from './config';
 
 class Service {
     constructor(options) {
