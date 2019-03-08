@@ -9,4 +9,6 @@ for (const key in cfg) {
     }
 }
 
+console.log("Using Config: " + JSON.stringify(cfg))
+
 export default cfg
