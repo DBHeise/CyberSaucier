@@ -40,7 +40,7 @@ class Service {
     async InitGit() {
         const recipeFolder = path.resolve(this.cfg.RecipeFolder);
 
-        if (this.cfg.RecipeGit) {
+        if (this.cfg.RecipeGit && this.cfg.RecipeGit.length > 0) {
             if (this.cfg.RecipeGitSparse && this.cfg.RecipeGitSparse.length > 0) {
                 await this.setupSparseRepo(recipeFolder, this.cfg.RecipeGit, this.cfg.RecipeGitSparse)
             } else {
