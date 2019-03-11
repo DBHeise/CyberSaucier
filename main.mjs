@@ -76,8 +76,11 @@ if (cluster.isMaster) {
                     if (err) {
                         console.error("ERROR pulling from git: " + JSON.stringify(err))
                     }
+                    console.log("GitUpdate: " + JSON.stringify(update))
                     if (update && update.files && update.files.length > 0) {
                         process.send({ "MESSAGE": MESSAGE_UPDATEDREPO, "Update": update })
+                    } else {
+                        console.log("No changes to git repo")
                     }
                     setTimeout(doGitCheck, config.GitInterval)    
                 })                                
