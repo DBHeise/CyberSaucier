@@ -2,6 +2,8 @@
     "Port": 7000,
     "ListenIP": "0.0.0.0",
     "DefaultFile": "cyberchef.htm",
+    "DisableHttpLogging": true,
+    "LogLevel": 50,
     "RecipeFolder": "./recipes",
     "RecipeGit": "https://github.com/DBHeise/CyberChefRecipes.git",
     "RecipeGitSparse": "Simplified/*",

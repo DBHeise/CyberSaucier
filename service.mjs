@@ -9,11 +9,13 @@ import pino from 'hapi-pino';
 import cChef from 'cyberchef/src/node/index';
 import git from 'simple-git';
 import config from './config';
+import logger from './logger';
+const log = logger("service")
 
 class Service {
-    constructor(options) {
-        this.cfg = options || config;
-
+    constructor(options) {        
+        log.Trace("cTor Called")
+        this.cfg = options || config;        
         this.server = new Hapi.server({
             port: this.cfg.Port,
             host: this.cfg.ListenIP
@@ -24,6 +26,7 @@ class Service {
     }
 
     async Init() {
+        log.Trace("Initializing Service")
         this.server.route({ method: "GET", path: "/", handler: this.handlerGetStaticFile })
         this.server.route({ method: "POST", path: "/", handler: this.handlerAllRecipes })
         this.server.route({ method: "POST", path: "/{name}", handler: this.handlerOneRecipe })
@@ -33,11 +36,12 @@ class Service {
         const recipeFolder = path.resolve(this.cfg.RecipeFolder);
         await this.server.register(inert);
 
-        if (!(this.cfg.DisableLogging)) {
+        if (!(this.cfg.DisableHttpLogging)) {
             await this.server.register(pino);
         }
     }
     async InitGit() {
+        log.Trace("Initializing Git")
         const recipeFolder = path.resolve(this.cfg.RecipeFolder);
 
         if (this.cfg.RecipeGit && this.cfg.RecipeGit.length > 0) {
@@ -51,11 +55,13 @@ class Service {
     }
 
     async Start() {
+        log.Trace("Starting Service")
         await this.server.start();
-        console.log(`Server running at: ${this.server.info.uri}`);
+        log.Info(`Server running at: ${this.server.info.uri}`);
     }
 
     UpdateRecipies(updateBlob) {
+        log.Trace("Updating Recipies")
         let self = this
         const recipeFolder = path.resolve(self.cfg.RecipeFolder);        
         if (updateBlob) {
@@ -184,12 +190,13 @@ class Service {
     }
 
     removeRecipe(fullPath) {
+        log.Trace("Removing Recipie:" + fullpath);
         let name = this.fileMap[fullPath]
         delete this.list[name];
     }
 
     loadRecipeFile(fullPath, fileName) {
-        console.log("Loading Recipe: " + fullPath)
+        log.Trace("Loading Recipe: " + fullPath)
         let content = fs.readFileSync(fullPath);
         let j = JSON.parse(content);
         j.filename = fileName
@@ -215,7 +222,7 @@ class Service {
                 }
             }
         } catch (err) {
-            console.error("Error occured while loading recipies", err);
+            log.Error("Error occured while loading recipies: " + JSON.stringify(err));
         }
     }
 
@@ -223,31 +230,31 @@ class Service {
     async setupSparseRepo(localFolder, remoteGit, sparseFolder) {
         try {
             fs.accessSync(localFolder, fs.constants.R_OK);
-            console.log(`Local git folder exists: ${localFolder}`)
+            log.Info(`Local git folder exists: ${localFolder}`)
         } catch (err) {
             //if the repo does not exist, clone it now
-            console.log(`Setting up sparse checkout locally: ${localFolder}`)
+            log.Info(`Setting up sparse checkout locally: ${localFolder}`)
             await git('.').silent(true).clone(remoteGit, localFolder, ["--no-checkout"])
             let g = git(localFolder)
             g.addConfig("core.sparsecheckout", "true")
             fs.writeFileSync(path.join(localFolder, ".git/info/sparse-checkout"), sparseFolder)
         }
 
-        console.log(`Checkingout Latest`)
+        log.Info(`Checkingout Latest`)
         await git(localFolder).silent(true).checkout("--")
     }
 
     async setupFullRepo(localFolder, remoteGit) {
         try {
             fs.accessSync(localFolder, fs.constants.R_OK);
-            console.log(`Local git folder exists: ${localFolder}`)
+            log.Info(`Local git folder exists: ${localFolder}`)
         } catch (err) {
             //if the repo does not exist, clone it now
-            console.log(`Cloning repo locally: ${localFolder}`)
+            log.Info(`Cloning repo locally: ${localFolder}`)
             await git('.').silent(true).clone(remoteGit, localFolder);
         }
 
-        console.log(`Pulling Latest`)
+        log.Info(`Pulling Latest`)
         await git(localFolder).silent(true).pull()
     }
 

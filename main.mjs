@@ -6,10 +6,13 @@ import path from 'path';
 import Service from './service';
 import git from 'simple-git';
 import config from './config';
+import logger from './logger';
+const log = logger("main")
 
 const MESSAGE_UPDATEDREPO = "UpdatedRepo"
+
 process.on('unhandledRejection', (err) => {
-    console.log(err);
+    log.Error(err);
     process.exit(1);
 });
 
@@ -17,7 +20,7 @@ let children = []
 
 
 function childMsgHandler(msg) {
-    console.log("Master recieved a message: " + JSON.stringify(msg))
+    log.Debug("Master recieved a message: " + JSON.stringify(msg))
     children.forEach(child => {
         child.send(msg);
     });
@@ -38,7 +41,7 @@ if (cluster.isMaster) {
 
     let numCPUs = os.cpus().length;
     let numThreads = numCPUs / 4;
-    console.log(`CPU Count: ${numCPUs}, Thread Count: ${numThreads}`)
+    log.Debug(`CPU Count: ${numCPUs}, Thread Count: ${numThreads}`)
 
     for (let i = 0; i < numThreads; i++) {
         children.push(startChild())
@@ -46,7 +49,7 @@ if (cluster.isMaster) {
     let gitWorker = startChild({ "CyberSaucier_Mode": "gitonly" })    
 
     cluster.on('exit', (worker, code, signal) => {
-        console.log(`worker ${worker.process.pid} died, restarting`);
+        log.Debug(`worker ${worker.process.pid} died, restarting`);
         if (worker.process.pid == gitWorker.process.pid) {
             gitWorker = startChild({ "CyberSaucier_Mode": "gitonly" })
         } else {
@@ -59,28 +62,27 @@ if (cluster.isMaster) {
     });
 
 } else {
-    console.log("Creating Service")
+    log.Info("Creating Service")
     let s = new Service()
     const IsGitMode = process.env.CyberSaucier_Mode || false;
     if (IsGitMode) {
 
         const gitrun = async (srv) => {
-            console.log("Initializing Git")
+            log.Trace("Initializing Git")
             await s.InitGit()
             process.send({ "MESSAGE": MESSAGE_UPDATEDREPO })
 
             const recipeFolder = path.resolve(config.RecipeFolder);
             const doGitCheck = async() => {
-                console.log("Checking for updates from git repo")
+                log.Debug("Checking for updates from git repo")
                 git(recipeFolder).silent(true).pull((err, update) => {                                        
                     if (err) {
-                        console.error("ERROR pulling from git: " + JSON.stringify(err))
-                    }
-                    console.log("GitUpdate: " + JSON.stringify(update))
+                        log.Error("ERROR pulling from git: " + JSON.stringify(err))
+                    }                    
                     if (update && update.files && update.files.length > 0) {
                         process.send({ "MESSAGE": MESSAGE_UPDATEDREPO, "Update": update })
                     } else {
-                        console.log("No changes to git repo")
+                        log.Debug("No changes to git repo")
                     }
                     setTimeout(doGitCheck, config.GitInterval)    
                 })                                
@@ -101,10 +103,10 @@ if (cluster.isMaster) {
                 }
             })
 
-            console.log("Initializing Service")
+            log.Debug("Initializing Service")
             await srv.Init()
 
-            console.log("Starting Service")
+            log.Info("Starting Service")
             await srv.Start()
 
 

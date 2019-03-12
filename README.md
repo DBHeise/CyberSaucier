@@ -70,6 +70,10 @@ Also you can look at the [testrecipies](https://github.com/DBHeise/CyberSaucier/
   - Sparse getting (only pull the specific folder in the repo) (can be empty)
 * GitInterval
   - Number of milliseconds to wait between git pulls (if 0 or less automatic git pulls are disabled)
+* DisableHttpLogging
+  - bool - disables logging of individual HTTP requests
+* LogLevel
+  - int - level of verbosity (All: 0,Trace: 15,Debug: 33,Info: 50,Warn: 75,Error: 90,Fatal: 100)
 
 
 It also supports all config parameters as environment variables prepended with "CYBERSAUCIER_"
