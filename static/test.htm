@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cyber Saucier Recipe Tester</title>
+  <link rel="stylesheet" href="bulma.min.css"/>
+  <script src="jsonlint.min.js"></script>
+</head>
+
+<body>
+  <section class="section">
+    <div class="container">
+      <h1 class="title">Cyber Saucier Recipe Creator</h1>
+    </div>
+  </section>
+  <section class="section">
+    <div class="container">
+      <div class="field">
+        <label class="label">CyberChef Recipe</label>
+        <div class="control">
+          <textarea id="recipe" class="textarea" placeholder="Place CyberChef JSON recipe here..."></textarea>
+        </div>
+        <article id="recipeValidation" class="message is-danger" style="display: none">
+          <div class="message-header">
+            <p>JSON Validation Error</p>
+          </div>
+          <div class="message-body">
+            <pre id="errorMsg"></pre>
+          </div>
+        </article>
+      </div>
+      <div class="field">
+        <label class="label">Recipe Name</label>
+        <div class="control">
+          <input id="RecipeName" class="input" type="text" placeholder="Recipe Name" required>
+        </div>
+      </div>
+      <div class="field">
+        <label class="label">Description</label>
+        <div class="control">
+          <input id="RecipeDescription" class="input" type="text" placeholder="Description" required>
+        </div>
+      </div>
+      <div class="field">
+        <label class="label">Author</label>
+        <div class="control">
+          <input id="Author" class="input" type="text" placeholder="Author" required>
+        </div>
+      </div>
+      <div class="field">
+        <label class="label">CVE (optional)</label>
+        <div class="control">
+          <input id="CVE" class="input" type="text" placeholder="CVE">
+        </div>
+      </div>
+      <div class="field">
+        <label class="label">Kill Chain</label>
+        <div class="control">
+          <div class="select is-fullwidth">
+            <select id="KC">
+              <option value="" disabled selected>Select an option below</option>
+              <option value="kc1">1. Reconnaissance</option>
+              <option value="kc2">2. Weaponisation</option>
+              <option value="kc3">3. Delivery</option>
+              <option value="kc4">4. Exploitation</option>
+              <option value="kc5">5. Installation</option>
+              <option value="kc6">6. Command &amp; Control</option>
+              <option value="kc7">7. Actions On</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="field">
+        <label class="label">ATT&amp;CK Technique</label>
+        <div class="control">
+          <div class="select is-fullwidth">
+            <select id="attack">
+              <option value="" disabled selected>Select an option below</option>
+              <option value="T1001">T1001 - Data Obfuscation</option>
+              <option value="T1002">T1002 - Data Compressed</option>
+              <option value="T1003">T1003 - Credential Dumping</option>
+              <option value="T1004">T1004 - Winlogon Helper DLL</option>
+              <option value="T1005">T1005 - Data from Local System</option>
+              <option value="T1006">T1006 - File System Logical Offsets</option>
+              <option value="T1007">T1007 - System Service Discovery</option>
+              <option value="T1008">T1008 - Fallback Channels</option>
+              <option value="T1009">T1009 - Binary Padding</option>
+              <option value="T1010">T1010 - Application Window Discovery</option>
+              <option value="T1011">T1011 - Exfiltration Over Other Network Medium</option>
+              <option value="T1012">T1012 - Query Registry</option>
+              <option value="T1013">T1013 - Port Monitors</option>
+              <option value="T1014">T1014 - Rootkit</option>
+              <option value="T1015">T1015 - Accessibility Features</option>
+              <option value="T1016">T1016 - System Network Configuration Discovery</option>
+              <option value="T1017">T1017 - Application Deployment Software</option>
+              <option value="T1018">T1018 - Remote System Discovery</option>
+              <option value="T1019">T1019 - System Firmware</option>
+              <option value="T1020">T1020 - Automated Exfiltration</option>
+              <option value="T1021">T1021 - Remote Services</option>
+              <option value="T1022">T1022 - Data Encrypted</option>
+              <option value="T1023">T1023 - Shortcut Modification</option>
+              <option value="T1024">T1024 - Custom Cryptographic Protocol</option>
+              <option value="T1025">T1025 - Data from Removable Media</option>
+              <option value="T1026">T1026 - Multiband Communication</option>
+              <option value="T1027">T1027 - Obfuscated Files or Information</option>
+              <option value="T1028">T1028 - Windows Remote Management</option>
+              <option value="T1029">T1029 - Scheduled Transfer</option>
+              <option value="T1030">T1030 - Data Transfer Size Limits</option>
+              <option value="T1031">T1031 - Modify Existing Service</option>
+              <option value="T1032">T1032 - Standard Cryptographic Protocol</option>
+              <option value="T1033">T1033 - System Owner/User Discovery</option>
+              <option value="T1034">T1034 - Path Interception</option>
+              <option value="T1035">T1035 - Service Execution</option>
+              <option value="T1036">T1036 - Masquerading</option>
+              <option value="T1037">T1037 - Logon Scripts</option>
+              <option value="T1038">T1038 - DLL Search Order Hijacking</option>
+              <option value="T1039">T1039 - Data from Network Shared Drive</option>
+              <option value="T1040">T1040 - Network Sniffing</option>
+              <option value="T1041">T1041 - Exfiltration Over Command and Control Channel</option>
+              <option value="T1042">T1042 - Change Default File Association</option>
+              <option value="T1043">T1043 - Commonly Used Port</option>
+              <option value="T1044">T1044 - File System Permissions Weakness</option>
+              <option value="T1045">T1045 - Software Packing</option>
+              <option value="T1046">T1046 - Network Service Scanning</option>
+              <option value="T1047">T1047 - Windows Management Instrumentation</option>
+              <option value="T1048">T1048 - Exfiltration Over Alternative Protocol</option>
+              <option value="T1049">T1049 - System Network Connections Discovery</option>
+              <option value="T1050">T1050 - New Service</option>
+              <option value="T1051">T1051 - Shared Webroot</option>
+              <option value="T1052">T1052 - Exfiltration Over Physical Medium</option>
+              <option value="T1053">T1053 - Scheduled Task</option>
+              <option value="T1054">T1054 - Indicator Blocking</option>
+              <option value="T1055">T1055 - Process Injection</option>
+              <option value="T1056">T1056 - Input Capture</option>
+              <option value="T1057">T1057 - Process Discovery</option>
+              <option value="T1058">T1058 - Service Registry Permissions Weakness</option>
+              <option value="T1059">T1059 - Command-Line Interface</option>
+              <option value="T1060">T1060 - Registry Run Keys / Startup Folder</option>
+              <option value="T1061">T1061 - Graphical User Interface</option>
+              <option value="T1062">T1062 - Hypervisor</option>
+              <option value="T1063">T1063 - Security Software Discovery</option>
+              <option value="T1064">T1064 - Scripting</option>
+              <option value="T1065">T1065 - Uncommonly Used Port</option>
+              <option value="T1066">T1066 - Indicator Removal from Tools</option>
+              <option value="T1067">T1067 - Bootkit</option>
+              <option value="T1068">T1068 - Exploitation for Privilege Escalation</option>
+              <option value="T1069">T1069 - Permission Groups Discovery</option>
+              <option value="T1070">T1070 - Indicator Removal on Host</option>
+              <option value="T1071">T1071 - Standard Application Layer Protocol</option>
+              <option value="T1072">T1072 - Third-party Software</option>
+              <option value="T1073">T1073 - DLL Side-Loading</option>
+              <option value="T1074">T1074 - Data Staged</option>
+              <option value="T1075">T1075 - Pass the Hash</option>
+              <option value="T1076">T1076 - Remote Desktop Protocol</option>
+              <option value="T1077">T1077 - Windows Admin Shares</option>
+              <option value="T1078">T1078 - Valid Accounts</option>
+              <option value="T1079">T1079 - Multilayer Encryption</option>
+              <option value="T1080">T1080 - Taint Shared Content</option>
+              <option value="T1081">T1081 - Credentials in Files</option>
+              <option value="T1082">T1082 - System Information Discovery</option>
+              <option value="T1083">T1083 - File and Directory Discovery</option>
+              <option value="T1084">T1084 - Windows Management Instrumentation Event Subscription</option>
+              <option value="T1085">T1085 - Rundll32</option>
+              <option value="T1086">T1086 - PowerShell</option>
+              <option value="T1087">T1087 - Account Discovery</option>
+              <option value="T1088">T1088 - Bypass User Account Control</option>
+              <option value="T1089">T1089 - Disabling Security Tools</option>
+              <option value="T1090">T1090 - Connection Proxy</option>
+              <option value="T1091">T1091 - Replication Through Removable Media</option>
+              <option value="T1092">T1092 - Communication Through Removable Media</option>
+              <option value="T1093">T1093 - Process Hollowing</option>
+              <option value="T1094">T1094 - Custom Command and Control Protocol</option>
+              <option value="T1095">T1095 - Standard Non-Application Layer Protocol</option>
+              <option value="T1096">T1096 - NTFS File Attributes</option>
+              <option value="T1097">T1097 - Pass the Ticket</option>
+              <option value="T1098">T1098 - Account Manipulation</option>
+              <option value="T1099">T1099 - Timestomp</option>
+              <option value="T1100">T1100 - Web Shell</option>
+              <option value="T1101">T1101 - Security Support Provider</option>
+              <option value="T1102">T1102 - Web Service</option>
+              <option value="T1103">T1103 - AppInit DLLs</option>
+              <option value="T1104">T1104 - Multi-Stage Channels</option>
+              <option value="T1105">T1105 - Remote File Copy</option>
+              <option value="T1106">T1106 - Execution through API</option>
+              <option value="T1107">T1107 - File Deletion</option>
+              <option value="T1108">T1108 - Redundant Access</option>
+              <option value="T1109">T1109 - Component Firmware</option>
+              <option value="T1110">T1110 - Brute Force</option>
+              <option value="T1111">T1111 - Two-Factor Authentication Interception</option>
+              <option value="T1112">T1112 - Modify Registry</option>
+              <option value="T1113">T1113 - Screen Capture</option>
+              <option value="T1114">T1114 - Email Collection</option>
+              <option value="T1115">T1115 - Clipboard Data</option>
+              <option value="T1116">T1116 - Code Signing</option>
+              <option value="T1117">T1117 - Regsvr32</option>
+              <option value="T1118">T1118 - InstallUtil</option>
+              <option value="T1119">T1119 - Automated Collection</option>
+              <option value="T1120">T1120 - Peripheral Device Discovery</option>
+              <option value="T1121">T1121 - Regsvcs/Regasm</option>
+              <option value="T1122">T1122 - Component Object Model Hijacking</option>
+              <option value="T1123">T1123 - Audio Capture</option>
+              <option value="T1124">T1124 - System Time Discovery</option>
+              <option value="T1125">T1125 - Video Capture</option>
+              <option value="T1126">T1126 - Network Share Connection Removal</option>
+              <option value="T1127">T1127 - Trusted Developer Utilities</option>
+              <option value="T1128">T1128 - Netsh Helper DLL</option>
+              <option value="T1129">T1129 - Execution through Module Load</option>
+              <option value="T1130">T1130 - Install Root Certificate</option>
+              <option value="T1131">T1131 - Authentication Package</option>
+              <option value="T1132">T1132 - Data Encoding</option>
+              <option value="T1133">T1133 - External Remote Services</option>
+              <option value="T1134">T1134 - Access Token Manipulation</option>
+              <option value="T1135">T1135 - Network Share Discovery</option>
+              <option value="T1136">T1136 - Create Account</option>
+              <option value="T1137">T1137 - Office Application Startup</option>
+              <option value="T1138">T1138 - Application Shimming</option>
+              <option value="T1139">T1139 - Bash History</option>
+              <option value="T1140">T1140 - Deobfuscate/Decode Files or Information</option>
+              <option value="T1141">T1141 - Input Prompt</option>
+              <option value="T1142">T1142 - Keychain</option>
+              <option value="T1143">T1143 - Hidden Window</option>
+              <option value="T1144">T1144 - Gatekeeper Bypass</option>
+              <option value="T1145">T1145 - Private Keys</option>
+              <option value="T1146">T1146 - Clear Command History</option>
+              <option value="T1147">T1147 - Hidden Users</option>
+              <option value="T1148">T1148 - HISTCONTROL</option>
+              <option value="T1149">T1149 - LC_MAIN Hijacking</option>
+              <option value="T1150">T1150 - Plist Modification</option>
+              <option value="T1151">T1151 - Space after Filename</option>
+              <option value="T1152">T1152 - Launchctl</option>
+              <option value="T1153">T1153 - Source</option>
+              <option value="T1154">T1154 - Trap</option>
+              <option value="T1155">T1155 - AppleScript</option>
+              <option value="T1156">T1156 - .bash_profile and .bashrc</option>
+              <option value="T1157">T1157 - Dylib Hijacking</option>
+              <option value="T1158">T1158 - Hidden Files and Directories</option>
+              <option value="T1159">T1159 - Launch Agent</option>
+              <option value="T1160">T1160 - Launch Daemon</option>
+              <option value="T1161">T1161 - LC_LOAD_DYLIB Addition</option>
+              <option value="T1162">T1162 - Login Item</option>
+              <option value="T1163">T1163 - Rc.common</option>
+              <option value="T1164">T1164 - Re-opened Applications</option>
+              <option value="T1165">T1165 - Startup Items</option>
+              <option value="T1166">T1166 - Setuid and Setgid</option>
+              <option value="T1167">T1167 - Securityd Memory</option>
+              <option value="T1168">T1168 - Local Job Scheduling</option>
+              <option value="T1169">T1169 - Sudo</option>
+              <option value="T1170">T1170 - Mshta</option>
+              <option value="T1171">T1171 - LLMNR/NBT-NS Poisoning and Relay</option>
+              <option value="T1172">T1172 - Domain Fronting</option>
+              <option value="T1173">T1173 - Dynamic Data Exchange</option>
+              <option value="T1174">T1174 - Password Filter DLL</option>
+              <option value="T1175">T1175 - Distributed Component Object Model</option>
+              <option value="T1176">T1176 - Browser Extensions</option>
+              <option value="T1177">T1177 - LSASS Driver</option>
+              <option value="T1178">T1178 - SID-History Injection</option>
+              <option value="T1179">T1179 - Hooking</option>
+              <option value="T1180">T1180 - Screensaver</option>
+              <option value="T1181">T1181 - Extra Window Memory Injection</option>
+              <option value="T1182">T1182 - AppCert DLLs</option>
+              <option value="T1183">T1183 - Image File Execution Options Injection</option>
+              <option value="T1184">T1184 - SSH Hijacking</option>
+              <option value="T1185">T1185 - Man in the Browser</option>
+              <option value="T1186">T1186 - Process Doppelgänging</option>
+              <option value="T1187">T1187 - Forced Authentication</option>
+              <option value="T1188">T1188 - Multi-hop Proxy</option>
+              <option value="T1189">T1189 - Drive-by Compromise</option>
+              <option value="T1190">T1190 - Exploit Public-Facing Application</option>
+              <option value="T1191">T1191 - CMSTP</option>
+              <option value="T1192">T1192 - Spearphishing Link</option>
+              <option value="T1193">T1193 - Spearphishing Attachment</option>
+              <option value="T1194">T1194 - Spearphishing via Service</option>
+              <option value="T1195">T1195 - Supply Chain Compromise</option>
+              <option value="T1196">T1196 - Control Panel Items</option>
+              <option value="T1197">T1197 - BITS Jobs</option>
+              <option value="T1198">T1198 - SIP and Trust Provider Hijacking</option>
+              <option value="T1199">T1199 - Trusted Relationship</option>
+              <option value="T1200">T1200 - Hardware Additions</option>
+              <option value="T1201">T1201 - Password Policy Discovery</option>
+              <option value="T1202">T1202 - Indirect Command Execution</option>
+              <option value="T1203">T1203 - Exploitation for Client Execution</option>
+              <option value="T1204">T1204 - User Execution</option>
+              <option value="T1205">T1205 - Port Knocking</option>
+              <option value="T1206">T1206 - Sudo Caching</option>
+              <option value="T1207">T1207 - DCShadow</option>
+              <option value="T1208">T1208 - Kerberoasting</option>
+              <option value="T1209">T1209 - Time Providers</option>
+              <option value="T1210">T1210 - Exploitation of Remote Services</option>
+              <option value="T1211">T1211 - Exploitation for Defense Evasion</option>
+              <option value="T1212">T1212 - Exploitation for Credential Access</option>
+              <option value="T1213">T1213 - Data from Information Repositories</option>
+              <option value="T1214">T1214 - Credentials in Registry</option>
+              <option value="T1215">T1215 - Kernel Modules and Extensions</option>
+              <option value="T1216">T1216 - Signed Script Proxy Execution</option>
+              <option value="T1217">T1217 - Browser Bookmark Discovery</option>
+              <option value="T1218">T1218 - Signed Binary Proxy Execution</option>
+              <option value="T1219">T1219 - Remote Access Tools</option>
+              <option value="T1220">T1220 - XSL Script Processing</option>
+              <option value="T1221">T1221 - Template Injection</option>
+              <option value="T1222">T1222 - File Permissions Modification</option>
+              <option value="T1223">T1223 - Compiled HTML File</option>
+              <option value="T1480">T1480 - Execution Guardrails</option>
+              <option value="T1482">T1482 - Domain Trust Discovery</option>
+              <option value="T1483">T1483 - Domain Generation Algorithms</option>
+              <option value="T1484">T1484 - Group Policy Modification</option>
+              <option value="T1485">T1485 - Data Destruction</option>
+              <option value="T1486">T1486 - Data Encrypted for Impact</option>
+              <option value="T1487">T1487 - Disk Structure Wipe</option>
+              <option value="T1488">T1488 - Disk Content Wipe</option>
+              <option value="T1489">T1489 - Service Stop</option>
+              <option value="T1490">T1490 - Inhibit System Recovery</option>
+              <option value="T1491">T1491 - Defacement</option>
+              <option value="T1492">T1492 - Stored Data Manipulation</option>
+              <option value="T1493">T1493 - Transmitted Data Manipulation</option>
+              <option value="T1494">T1494 - Runtime Data Manipulation</option>
+              <option value="T1495">T1495 - Firmware Corruption</option>
+              <option value="T1496">T1496 - Resource Hijacking</option>
+              <option value="T1497">T1497 - Virtualization/Sandbox Evasion</option>
+              <option value="T1498">T1498 - Network Denial of Service</option>
+              <option value="T1499">T1499 - Endpoint Denial of Service</option>
+              <option value="T1500">T1500 - Compile After Delivery</option>
+              <option value="T1501">T1501 - Systemd Service</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="field">
+        <div class="buttons has-addons is-centered">
+          <button onclick="onValidate()" class="button">Validate</button>
+          <button onclick="onExport()" class="button">Export</button>
+          <button onclick="onClear()" class="button">Clear</button>
+        </div>
+      </div>
+    </div>
+  </section>
+  <script>
+    var recipeTextArea = document.getElementById("recipe")
+    var recipeNameInput = document.getElementById("RecipeName")
+    var recipeDescripInput = document.getElementById("RecipeDescription")
+    var authorInput = document.getElementById("Author")
+    var cveInput = document.getElementById("CVE")
+    var kcSelect = document.getElementById("KC")
+    var attackSelect = document.getElementById("attack")
+    var recipeValidationBlock = document.getElementById("recipeValidation")
+    var vblocks = [recipeTextArea, recipeNameInput, recipeDescripInput, authorInput, cveInput, kcSelect, attackSelect]
+
+    const urlParams = new URLSearchParams(window.location.search);
+    var recipeFromQuery = urlParams.get("recipe")
+    if (recipeFromQuery != "") {
+      recipeTextArea.value = atob(recipeFromQuery)
+    }
+
+    function clearValidationClasses() {
+      vblocks.forEach(block => {
+        block.classList.remove("is-success")
+        block.classList.remove("is-danger")
+      });
+      recipeValidationBlock.style.display = "none";
+    }
+
+    function makeSureIsNotEmpty(element) {
+      if (element.value == "") {
+        element.classList.add("is-danger")
+        return false
+      } else {
+        element.classList.add("is-success")
+        return true
+      }
+
+    }
+
+    function onValidate() {
+      var ans = true
+      var errorMsgBlock = document.getElementById("errorMsg")
+      clearValidationClasses()
+
+      var recipeJson = recipeTextArea.value
+      try {
+        jsonlint.parse(recipeJson)
+        recipeTextArea.classList.add("is-success")
+      } catch (e) {
+        recipeValidationBlock.style.display = "inline"
+        recipeTextArea.classList.add("is-danger")
+        errorMsgBlock.innerText = e.message
+        ans &= false
+      }
+      ans &= makeSureIsNotEmpty(recipeNameInput)
+      ans &= makeSureIsNotEmpty(recipeDescripInput)
+      ans &= makeSureIsNotEmpty(authorInput)
+
+      return ans
+    }
+
+    function formatDate(date) {
+      return date.toISOString()
+    }
+
+    function onExport() {
+      if (onValidate()) {
+        var obj = {
+          "recipe": JSON.parse(recipeTextArea.value),
+          "name" : recipeNameInput.value,
+          "meta": {
+            "author": authorInput.value,
+            "date": formatDate(new Date()),
+            "description": recipeDescripInput.value,
+            "cve": cveInput.value,
+            "attck": attackSelect.options[attackSelect.selectedIndex].value,
+            "kc": kcSelect.options[kcSelect.selectedIndex].value
+          }
+        }
+        if (attackSelect.selectedIndex < 1) { obj.meta.attck = null }
+        if (kcSelect.selectedIndex < 1 ) { obj.meta.kc = null }
+        var filename = obj.name + ".json"
+        var txt = JSON.stringify(obj)
+        var element = document.createElement('a')
+        element.setAttribute('href', 'data:application/json;charset=utf-8,' + encodeURIComponent(txt))
+        element.setAttribute('download', filename)
+        element.style.display = 'none';
+        document.body.appendChild(element);
+        element.click();
+        document.body.removeChild(element);
+      }
+    }
+
+    function onClear() {
+      clearValidationClasses()
+      recipeTextArea.value = ""
+      recipeValidationBlock.style.display = "none";
+      recipeNameInput.value = ""
+      recipeDescripInput.value = ""
+      authorInput.value = ""
+      cveInput.value = ""
+      kcSelect.selectedIndex = 0
+      attackSelect.selectedIndex = 0
+    }
+  </script>
+</body>
+
+</html>

@@ -15,11 +15,18 @@ const log = logger("service")
 class Service {
     constructor(options) {        
         log.Trace("cTor Called")
-        this.cfg = options || config;        
-        this.server = new Hapi.server({
+        this.cfg = options || config; 
+        var hapiServerCfg = {
             port: this.cfg.Port,
-            host: this.cfg.ListenIP
-        })
+            host: this.cfg.ListenIP,
+            routes: {
+                files :{
+                    relativeTo: path.join(fs.realpathSync('.'), 'static')
+                }
+            }
+        }       
+        this.server = new Hapi.server(hapiServerCfg)
+        log.Debug("HAPI Config: " + JSON.stringify(hapiServerCfg))
         this.server.self = this
         this.list = {}
         this.fileMap = {}
@@ -27,7 +34,7 @@ class Service {
 
     async Init() {
         log.Trace("Initializing Service")
-        this.server.route({ method: "GET", path: "/", handler: this.handlerGetStaticFile })
+        this.server.route({ method: "GET", path:"/", handler: this.handlerGetStaticFile })
         this.server.route({ method: "POST", path: "/", handler: this.handlerAllRecipes })
         this.server.route({ method: "POST", path: "/{name}", handler: this.handlerOneRecipe })
         this.server.route({ method: "GET", path: "/recipes", handler: this.handlerListRecipes })
@@ -35,6 +42,8 @@ class Service {
 
         const recipeFolder = path.resolve(this.cfg.RecipeFolder);
         await this.server.register(inert);
+
+        this.server.route({ method: "GET", path: "/{param*}",  handler: {directory: { path: '.', redirectToSlash: true}}})
 
         if (!(this.cfg.DisableHttpLogging)) {
             await this.server.register(pino);
@@ -72,7 +81,6 @@ class Service {
         }
         self.loadRecipes(recipeFolder)
     }
-
     //Default Route - static configured file
     handlerGetStaticFile(request, h) {
         let self = request.server.self;
@@ -209,12 +217,14 @@ class Service {
     async loadRecipes(folder) {
         let self = this
         try {
-            const names = await fsPromises.readdir(folder)
+            const names = fs.readdirSync(folder)
             for (let i = 0; i < names.length; i++) {
                 let fullPath = path.join(folder, names[i])
-                const f = await fsPromises.stat(fullPath)
+                const f = fs.statSync(fullPath)
                 if (f.isDirectory()) {
-                    await self.loadRecipes(fullPath)
+                    await self.loadRecipes(fullPath).catch(err => {
+                        log.Error("Error while loading recipies:" + err)
+                    })
                 } else {
                     if (names[i].endsWith(".json")) {
                         self.loadRecipeFile(fullPath, names[i])
@@ -222,7 +232,7 @@ class Service {
                 }
             }
         } catch (err) {
-            log.Error("Error occured while loading recipies: " + JSON.stringify(err));
+            log.Error("Error occured while loading recipies: " + err);
         }
     }
 
