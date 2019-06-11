@@ -1,4 +1,7 @@
-$cyberChefFile = Resolve-Path '.\static\CyberChef_v8.31.4.html'
+[CmdletBinding()]
+param(
+	[Parameter(Mandatory=$true)][String] $cyberChefFile	
+)
 $data = Get-Content -Path $cyberChefFile
 
 $data = $data.Replace("</body>", '<script src="inject.js"></script></body>')

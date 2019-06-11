@@ -10,7 +10,7 @@ testButton.setAttribute("data-toggle", "tooltip");
 testButton.setAttribute("data-orginial-title", "Export recipe");
 var i = document.createElement('i');
 i.classList.add("material-icons");
-i.innerText = "extension";
+i.innerText = "eject";
 testButton.appendChild(i);
 parent.insertBefore(testButton, parent.childNodes[0]);
 testButton.onclick = function() {
