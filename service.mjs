@@ -198,7 +198,7 @@ class Service {
     }
 
     removeRecipe(fullPath) {
-        log.Trace("Removing Recipie:" + fullpath);
+        log.Trace("Removing Recipie:" + fullPath);
         let name = this.fileMap[fullPath]
         delete this.list[name];
     }
