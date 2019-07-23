@@ -84,6 +84,7 @@ class Service {
     //Default Route - static configured file
     handlerGetStaticFile(request, h) {
         let self = request.server.self;
+        log.Trace("Serving Static File: " + self.cfg.DefaultFile)
         return h.file(self.cfg.DefaultFile)
     }
 

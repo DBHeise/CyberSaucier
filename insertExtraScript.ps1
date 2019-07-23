@@ -4,6 +4,6 @@ param(
 )
 $data = Get-Content -Path $cyberChefFile
 
-$data = $data.Replace("</body>", '<script src="inject.js"></script></body>')
+$data = $data.Replace("</body>", '<script src="saucier.js"></script></body>')
 
 Set-Content -Path $cyberChefFile -Value $data -Encoding ASCII
