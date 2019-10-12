@@ -1,7 +1,7 @@
 {
     "Port": 7000,
     "ListenIP": "0.0.0.0",
-    "DefaultFile": ".\\CyberChef_v9.0.1.html",    
+    "DefaultFile": ".\\CyberChef_v9.7.9.html",    
     "DisableHttpLogging": true,
     "LogLevel": 50,
     "RecipeFolder": "./recipes",
