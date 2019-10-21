@@ -8,6 +8,7 @@ import Service from './service'
 import supertest from 'supertest'
 import fs from 'fs'
 import {promisify} from 'util'
+import commander from 'commander'
 
 const m = new Mocha()
 m.timeout(0)
@@ -63,28 +64,27 @@ function testOptions() {
 }
 
 ////////////////// Cyber Chef Tests
-let cyberChefTestSuite = new Mocha.Suite("CyberChef Checks", new Mocha.Context())
+let cyberChefTestSuite = new Mocha.Suite("CyberChef Simple Checks", new Mocha.Context())
 cyberChefTestSuite.addTest(new Mocha.Test("simple recipe check", () => {
     //Test #1
     let input = "test"
     let recipe = [{ "op": "To Hex", "args": ["Space"] }]
-    cChef.bake(input, recipe).then(result => {
-        should.exist(result)
-        should(result.result).be.exactly("74 65 73 74")
-    }).catch(reason => {
-        should.not.exist(reason)
-    })
+    let dish = cChef.bake(input, recipe)
+    should.exist(dish)
+    should(dish.value).be.exactly("74 65 73 74")
+    
 }))
 cyberChefTestSuite.addTest(new Mocha.Test("simple expected failure", () => {
     //Test #2
     let input = "test"
     let failRecipe = [{ "op": "From Hex", "args": ["Space"] }]
-    cChef.bake(input, failRecipe).then(result => {
-        should.not.exist(result)
-    }).catch(reason => {
-        should.exist(reason)
-        should(reason.message).be.exactly("Data is not a valid byteArray: [null,null]")
-    })
+    let dish = null
+    try {
+        dish = cChef.bake(input, failRecipe)        
+    } catch (e) {
+        should.exist(e)
+        should(e.message).be.exactly("Data is not a valid byteArray: [null,null]")
+    }    
 }))
 m.suite.addSuite(cyberChefTestSuite)
 
@@ -295,7 +295,7 @@ gitTestSuite.addTest(new Mocha.Test("Local Folder", (done) => {
         GitInterval: -1
     }))
 }))
-gitTestSuite.addTest(new Mocha.Test("Remote Git Repo", (done) => {
+gitTestSuite.addTest(new Mocha.Test("Remote Git Repo", function(done) {
     let config = {
         Port: 4321,
         Listen: "127.0.0.1",
@@ -305,6 +305,7 @@ gitTestSuite.addTest(new Mocha.Test("Remote Git Repo", (done) => {
         DisableLogging: true,
         GitInterval: -1
     };
+    this.test.timeout(10000);
     (async (s, cfg) => {
         await s.InitGit()
         should.exist(s.list.TestRecipe001)
@@ -312,7 +313,7 @@ gitTestSuite.addTest(new Mocha.Test("Remote Git Repo", (done) => {
         done()
     })(new Service(config), config);
 }))
-gitTestSuite.addTest(new Mocha.Test("Sparse Git Repo", (done) => {
+gitTestSuite.addTest(new Mocha.Test("Sparse Git Repo", function(done) {
     let config = {
         Port: 4321,
         Listen: "127.0.0.1",
@@ -322,6 +323,7 @@ gitTestSuite.addTest(new Mocha.Test("Sparse Git Repo", (done) => {
         DisableLogging: true,
         GitInterval: -1
     };
+    this.test.timeout(10000);
     (async (s, cfg) => {
         await s.InitGit()
         should.exist(s.list.TestRecipe001)
@@ -348,4 +350,18 @@ gitTestSuite.addTest(new Mocha.Test("Sparse Git Repo", (done) => {
 //TODO: git update - removed recipe
 m.suite.addSuite(gitTestSuite)
 
-m.run()
+
+const program = new commander.Command()
+program
+    .version("0.0.2")
+    .arguments("[test selector]")
+    .action(function(testRE) {
+    if (testRE) {
+        m.grep(testRE).run()
+    } else {
+        m.run()
+    }
+})
+
+program.parse(process.argv);
+

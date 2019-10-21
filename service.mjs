@@ -3,7 +3,7 @@
 import fs from 'fs';
 const fsPromises = fs.promises;
 import path from 'path';
-import Hapi from 'hapi';
+import Hapi from '@hapi/hapi';
 import inert from 'inert';
 import pino from 'hapi-pino';
 import cChef from 'cyberchef/src/node/index';
@@ -117,12 +117,12 @@ class Service {
         return ans
     }
 
-    handleCChefResults(baked, recipe) {
+    handleCChefResults(dish, recipe) {
         let rObj = { 'recipeName': recipe.name }
-        if (baked.error || baked.progress < 1) {
-            rObj['error'] = baked
+        if (dish.error || dish.progress < 1) {
+            rObj['error'] = dish
         } else {
-            rObj['result'] = baked.result
+            rObj['result'] = dish.value
 
             //Add recipe meta data
             for (const key in recipe["meta"]) {
@@ -135,6 +135,16 @@ class Service {
         return rObj
     }
 
+    runCChefRecipe(input, recipe) {
+        let dish = null
+        try { 
+            dish = cChef.bake(input, recipe.recipe)
+        } catch (e) {
+            dish = { error: {message: e.message, type: e.type, code: e.code, stack: e.stack.split('\n') }}
+        }
+        return this.handleCChefResults(dish, recipe)
+    }
+
     //POST - runs the request body as a payload against ALL recipes
     handlerAllRecipes(request, h) {
         let self = request.server.self;
@@ -144,11 +154,8 @@ class Service {
         return new Promise((resolve, reject) => {
             let recipes = self.filterRecipes(self.list, matcher, file)
             let ovens = recipes.map((name) => {
-                return cChef.bake(input, self.list[name].recipe).then((baked) => {
-                    return self.handleCChefResults(baked, self.list[name])
-                }).catch(err => {
-
-                })
+                const recipe = self.list[name]
+                return self.runCChefRecipe(input, recipe)
             })
             Promise.all(ovens).then((results) => {
                 resolve(results);
@@ -167,11 +174,7 @@ class Service {
             r.statusCode = 406;
             return r
         } else {
-            return cChef.bake(input, recipe.recipe).then(r => {
-                return self.handleCChefResults(r, recipe)
-            }).catch(err => {
-
-            })
+            return self.runCChefRecipe(input, recipe)
         }
     }
 
