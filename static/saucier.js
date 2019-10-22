@@ -18,6 +18,6 @@ testButton.onclick = function() {
     var recipeJson = JSON.stringify(recipeObj)
     var base64 = btoa(recipeJson)
     
-    var newUrl = window.location.protocol + "//" + window.location.host + "/test.htm?recipe=" + base64
+    var newUrl = window.location.origin + window.location.pathname + "test.htm?recipe=" + base64
     window.location = newUrl
 }
