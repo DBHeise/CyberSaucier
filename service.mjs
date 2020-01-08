@@ -72,14 +72,18 @@ class Service {
     UpdateRecipies(updateBlob) {
         log.Trace("Updating Recipies")
         let self = this
-        const recipeFolder = path.resolve(self.cfg.RecipeFolder);        
-        if (updateBlob) {
-            let delta = updateBlob.files
-            for (let i = 0; i < delta.length; i++) {                
-                self.removeRecipe(path.resolve(recipeFolder, delta[i]))
+        try {
+            const recipeFolder = path.resolve(self.cfg.RecipeFolder);        
+            if (updateBlob) {
+                let delta = updateBlob.files
+                for (let i = 0; i < delta.length; i++) {                
+                    self.removeRecipe(path.resolve(recipeFolder, delta[i]))
+                }
             }
+            self.loadRecipes(recipeFolder)
+        } catch (err) {
+            log.Error("Error occured while Updating Recipies: " + err);
         }
-        self.loadRecipes(recipeFolder)
     }
     //Default Route - static configured file
     handlerGetStaticFile(request, h) {
