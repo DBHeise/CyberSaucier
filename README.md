@@ -25,7 +25,7 @@ Well you've got a couple of options, but I recommend the following:
     ```
 * The service is now listening on http://localhost:7000 (unless you changed the port in the config & Dockerfile obviously, then its listening on that port)
 
-**WARNING** you must use a version of node less than v12 and greater than v9 for CyberChef to work correctly! (see CyberChef [wiki](https://github.com/gchq/CyberChef/wiki/Node-API) for more details) I recommend [v10 latest](https://nodejs.org/dist/latest-v10.x/)
+**WARNING** you must use a version of node less than v12 and greater than v9 for CyberChef to work correctly! (see CyberChef [wiki](https://github.com/gchq/CyberChef/wiki/Node-API) for more details) I recommend [v11 latest](https://nodejs.org/dist/latest-v11.x/)
 
 ---
 ## Format of a Recipe File
