@@ -5,9 +5,11 @@
 
 This is a wrapper around [CyberChef](https://github.com/gchq/CyberChef) to allow for programmatic running of recipes.
 
+How is this different from [CyberChef-server](https://github.com/gchq/CyberChef-server)? At the time of its creation this was the only project that accomplished the goal of allowing programmatic access to CyberChef (CyberChef server was created on 21 Jun 2019, whereas this was created 18 Jan 2019). In addition, this wrapper includes recipies as part of the server (via server-side json files...either static or from a git repo), and a few other helpful features. The fundamental purpose of this service is to run a single input against multiple recipies and see which ones produce "output" (aka juice or sauce).
+
 ---
 ## How do I use it
-well you've got a couple of options, but I recommend the following:
+Well you've got a couple of options, but I recommend the following:
 * Clone the repo
 * Edit the cybersaucier.json file to your liking
   * specifically point it to a folder or git repo that contains the recipies you use
@@ -21,7 +23,9 @@ well you've got a couple of options, but I recommend the following:
     docker build . -t {mycooltag}
     docker run --rm -d -p 7000:7000/tcp {mycooltag}
     ```
-* The service is now listening on http://localhost:7000 (unless you changed the port in the config & Dockerfile, then its listening on that port)
+* The service is now listening on http://localhost:7000 (unless you changed the port in the config & Dockerfile obviously, then its listening on that port)
+
+**WARNING** you must use a version of node less than v12 and greater than v9 for CyberChef to work correctly! (see CyberChef [wiki](https://github.com/gchq/CyberChef/wiki/Node-API) for more details) I recommend [v10 latest](https://nodejs.org/dist/latest-v10.x/)
 
 ---
 ## Format of a Recipe File
@@ -36,7 +40,7 @@ Also you can look at the [testrecipies](https://github.com/DBHeise/CyberSaucier/
 ---
 ## API Endpoints
 * GET /
-  * returns the standard cyberchef.htm (also contained in this repo)
+  * returns the standard cyberchef webpage (also contained in this repo)
 * POST /?file=&match=
   * takes the POST body and runs all available recipes
   * (optional) file - the recipe filename must contain the given string
