@@ -335,23 +335,44 @@
           <button onclick="onClear()" class="button">Clear</button>
         </div>
       </div>
-    </div>
+      <div class="field">
+        <div class="label">Original Input</div>
+        <div class="control">
+          <textarea id="originalInput" class="textarea" placeholder="Original Source Input..."></textarea>
+        </div>
+      </div>
+      <div class="field">
+        <div class="label">Expected Output</div>
+        <div class="control">
+          <textarea id="expectedOutput" class="textarea" placeholder="Expected Recipe Output..."></textarea>
+        </div>
+      </div></div>
   </section>
   <script>
     var recipeTextArea = document.getElementById("recipe")
     var recipeNameInput = document.getElementById("RecipeName")
-    var recipeDescripInput = document.getElementById("RecipeDescription")
+    var recipeDescripInput = document.getElementById("RecipeDescription")    
     var authorInput = document.getElementById("Author")
     var cveInput = document.getElementById("CVE")
     var kcSelect = document.getElementById("KC")
     var attackSelect = document.getElementById("attack")
     var recipeValidationBlock = document.getElementById("recipeValidation")
+    var srcInput = document.getElementById("originalInput")
+    var srcOutput = document.getElementById("expectedOutput")
     var vblocks = [recipeTextArea, recipeNameInput, recipeDescripInput, authorInput, cveInput, kcSelect, attackSelect]
 
     const urlParams = new URLSearchParams(window.location.search);
     var recipeFromQuery = urlParams.get("recipe")
-    if (recipeFromQuery != "") {
+    if (recipeFromQuery && recipeFromQuery != "") {
       recipeTextArea.value = atob(recipeFromQuery)
+    }
+    var inputTxt = urlParams.get("input")
+    if (inputTxt && inputTxt != "") {
+      srcInput.value = atob(inputTxt)
+    }
+    var outputTxt = urlParams.get("output")
+    if (outputTxt && outputTxt != "") {
+      srcOutput.value = atob(outputTxt)
     }
 
     function clearValidationClasses() {
@@ -411,6 +432,10 @@
             "cve": cveInput.value,
             "attck": attackSelect.options[attackSelect.selectedIndex].value,
             "kc": kcSelect.options[kcSelect.selectedIndex].value
+          },
+          "verify": {
+            "orginialInput": srcInput.value,
+            "expectedOutput": srcOutput.value
           }
         }
         if (attackSelect.selectedIndex < 1) { obj.meta.attck = null }
@@ -435,6 +460,8 @@
       recipeDescripInput.value = ""
       authorInput.value = ""
       cveInput.value = ""
+      srcInput.value = ""
+      srcOutput.value = ""
       kcSelect.selectedIndex = 0
       attackSelect.selectedIndex = 0
     }

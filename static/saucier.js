@@ -17,7 +17,11 @@ testButton.onclick = function() {
     var recipeObj = app.getRecipeConfig()
     var recipeJson = JSON.stringify(recipeObj)
     var base64 = btoa(recipeJson)
+    var inputb64 = btoa(document.getElementById("input-text").value)
+    var outputb64 = btoa(document.getElementById("output-text").value)
     
-    var newUrl = window.location.origin + window.location.pathname + "test.htm?recipe=" + base64
+    var loc = window.location
+    var pathname = loc.pathname.substring(0, loc.pathname.lastIndexOf("/")+1)
+    var newUrl = loc.origin + pathname + "test.htm?recipe=" + base64 + "&input=" + inputb64 + "&output=" + outputb64
     window.location = newUrl
 }
