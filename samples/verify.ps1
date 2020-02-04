@@ -18,7 +18,10 @@ Get-ChildItem -Path $RuleFolder -Recurse -File -Include ("*.json") | ForEach-Obj
         if ($resp.result -eq $rule.verify.expectedOutput) {
             Write-Host -Object ($rule.name + " : PASS") -ForegroundColor Green -BackgroundColor Black            
         } else {
-            Write-Host -Object ($rule.name + " : FAIL") -ForegroundColor Red -BackgroundColor Black            
+            Write-Host -Object ($rule.name + " : FAIL" + [Environment]::NewLine +
+                ('Actual   = "' + $resp.result + '"') + [Environment]::NewLine +
+                ('Expected = "' + $rule.verify.expectedOutput + '"')
+            ) -ForegroundColor Red -BackgroundColor Black            
         }
     }
 }
