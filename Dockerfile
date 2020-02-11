@@ -1,5 +1,5 @@
 
-FROM node:lts-alpine
+FROM node:11-alpine
 RUN apk update && apk upgrade
 RUN apk add --no-cache git openssh
 WORKDIR /cybersaucier
