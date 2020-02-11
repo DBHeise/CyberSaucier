@@ -34,6 +34,7 @@ function startChild(env) {
 
 
 if (cluster.isMaster) {
+    log.Trace("Master started: " + JSON.stringify(config))
     var debug = process.execArgv.indexOf('--debug') !== -1;
     cluster.setupMaster({
         execArgv: process.execArgv.filter(function (s) { return s !== '--debug' })
@@ -91,7 +92,9 @@ if (cluster.isMaster) {
                 setTimeout(doGitCheck, config.GitInterval)
             }
         }
-        gitrun(s)
+        if (config.RecipeGit && config.RecipeGit.length > 0) {
+            gitrun(s)
+        } 
     } else {
 
         const run = async (srv) => {
@@ -105,6 +108,10 @@ if (cluster.isMaster) {
 
             log.Debug("Initializing Service")
             await srv.Init()
+
+            if (!config.RecipeGit || config.RecipeGit.length < 1) {
+                await srv.InitGit()
+            }
 
             log.Info("Starting Service")
             await srv.Start()

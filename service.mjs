@@ -33,7 +33,7 @@ class Service {
     }
 
     async Init() {
-        log.Trace("Initializing Service")
+        log.Trace("Initializing Service: " + JSON.stringify(this.cfg))
         this.server.route({ method: "GET", path:"/", handler: this.handlerGetStaticFile })
         this.server.route({ method: "POST", path: "/", handler: this.handlerAllRecipes })
         this.server.route({ method: "POST", path: "/{name}", handler: this.handlerOneRecipe })
@@ -151,6 +151,7 @@ class Service {
 
     //POST - runs the request body as a payload against ALL recipes
     handlerAllRecipes(request, h) {
+        log.Trace("Run ALL Recipe")
         let self = request.server.self;
         let matcher = request.query["match"]
         let file = request.query["file"]
@@ -170,6 +171,7 @@ class Service {
 
     //POST - runs the request body against the specified recipe
     handlerOneRecipe(request, h) {
+        log.Trace("Run Recipe")
         let self = request.server.self;
         let input = request.payload
         const recipe = self.list[request.params.name];
@@ -184,6 +186,7 @@ class Service {
 
     //Retrieves the list of recipe names
     handlerListRecipes(request, h) {
+        log.Trace("Listing Recipes")
         let ary = [];
         let self = request.server.self;
         for (let field in self.list) {
@@ -194,6 +197,7 @@ class Service {
 
     //Retrieves the specified recipe 
     handlerListOneRecipe(request, h) {
+        log.Trace("Listing ONE Recipe")
         let self = request.server.self;
         let recipe = self.list[request.params.name];
         if (typeof recipe === "undefined" || recipe === null || recipe === "") {
@@ -223,6 +227,7 @@ class Service {
 
     //Read all JSON files from the specified folder (and subfolders)
     async loadRecipes(folder) {
+        log.Trace("Loading Recipes from: " + folder)
         let self = this
         try {
             const names = fs.readdirSync(folder)

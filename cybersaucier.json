@@ -4,8 +4,5 @@
     "DefaultFile": "./CyberChef_v9.12.0.html",    
     "DisableHttpLogging": true,
     "LogLevel": 50,
-    "RecipeFolder": "./recipes",
-    "RecipeGit": "https://github.com/DBHeise/CyberChefRecipes.git",
-    "RecipeGitSparse": "Simplified/*",
-    "GitInterval": 60000
+    "RecipeFolder": "./recipes"
 }
