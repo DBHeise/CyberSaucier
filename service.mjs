@@ -251,6 +251,7 @@ class Service {
 
 
     async setupSparseRepo(localFolder, remoteGit, sparseFolder) {
+        log.Trace("Setting up Sparse Repo: " + remoteGit)
         try {
             fs.accessSync(localFolder, fs.constants.R_OK);
             log.Info(`Local git folder exists: ${localFolder}`)
@@ -268,6 +269,7 @@ class Service {
     }
 
     async setupFullRepo(localFolder, remoteGit) {
+        log.Trace("Setting up Full Repo: " + remoteGit)
         try {
             fs.accessSync(localFolder, fs.constants.R_OK);
             log.Info(`Local git folder exists: ${localFolder}`)

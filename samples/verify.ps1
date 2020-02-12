@@ -21,7 +21,8 @@ Get-ChildItem -Path $RuleFolder -Recurse -File -Include ("*.json") | ForEach-Obj
             Write-Host -Object ($rule.name + " : FAIL" + [Environment]::NewLine +
                 ('Actual   = "' + $resp.result + '"') + [Environment]::NewLine +
                 ('Expected = "' + $rule.verify.expectedOutput + '"')
-            ) -ForegroundColor Red -BackgroundColor Black            
+            ) -ForegroundColor Red -BackgroundColor Black   
+            Write-Verbose ($resp | ConvertTo-Json)         
         }
     }
 }
