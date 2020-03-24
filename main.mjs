@@ -41,7 +41,7 @@ if (cluster.isMaster) {
     });
 
     let numCPUs = os.cpus().length;
-    let numThreads = numCPUs / 4;
+    let numThreads = numCPUs;
     log.Debug(`CPU Count: ${numCPUs}, Thread Count: ${numThreads}`)
 
     for (let i = 0; i < numThreads; i++) {
