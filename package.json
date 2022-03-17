@@ -19,7 +19,7 @@
     "cyberchef": "9.12.0",
     "hapi-pino": "^6.3.0",
     "inert": "^5.1.3",
-    "simple-git": "^1.126.0"
+    "simple-git": "^3.3.0"
   },
   "main": "main.mjs",
   "scripts": {
