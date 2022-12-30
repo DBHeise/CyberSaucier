@@ -28,7 +28,7 @@
   },
   "devDependencies": {
     "commander": "^3.0.2",
-    "mocha": "^6.2.2",
+    "mocha": "^10.2.0",
     "should": "^13.2.3",
     "supertest": "^4.0.2"
   }
