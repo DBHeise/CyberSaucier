@@ -1,4 +1,4 @@
-import cfg from './cybersaucier.json';
+import cfg from './cybersaucier.json' with { type: "json" };
 
 for (const key in cfg) {
     if (cfg.hasOwnProperty(key)) {

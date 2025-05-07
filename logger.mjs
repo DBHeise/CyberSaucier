@@ -1,7 +1,7 @@
 'use strict';
 
 import chalk from 'chalk'
-import config from './config'
+import config from './config.mjs'
 
 const LogLevels = {
     All: 0,
