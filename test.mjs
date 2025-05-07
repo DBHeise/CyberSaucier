@@ -1,10 +1,10 @@
 "use strict";
-import cChef from 'cyberchef/src/node/index'
+import cChef from 'cyberchef/src/node/index.mjs'
 import should from 'should'
 import path from 'path'
 import crypto from 'crypto'
 import Mocha from 'mocha'
-import Service from './service'
+import Service from './service.mjs'
 import supertest from 'supertest'
 import fs from 'fs'
 import {promisify} from 'util'

@@ -1,12 +1,13 @@
 
-FROM node:11-alpine
+FROM node:18.20.4-alpine
 RUN apk update && apk upgrade
 RUN apk add --no-cache git openssh
 WORKDIR /cybersaucier
 COPY package*.json ./
-RUN npm install
+COPY *.js ./
+RUN npm cache clean --force && npm install
 COPY cybersaucier.json ./
 COPY *.mjs ./
 COPY static/ ./static/
 EXPOSE 7000
-CMD ["node", "--experimental-modules", "main.mjs"]
+CMD ["node", "main.mjs"]

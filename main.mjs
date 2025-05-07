@@ -3,10 +3,10 @@
 import cluster from 'cluster';
 import os from 'os';
 import path from 'path';
-import Service from './service';
+import Service from './service.mjs';
 import git from 'simple-git';
-import config from './config';
-import logger from './logger';
+import config from './config.mjs';
+import logger from './logger.mjs';
 const log = logger("main")
 
 const MESSAGE_UPDATEDREPO = "UpdatedRepo"
@@ -76,7 +76,7 @@ if (cluster.isMaster) {
             const recipeFolder = path.resolve(config.RecipeFolder);
             const doGitCheck = async() => {
                 log.Debug("Checking for updates from git repo")
-                git(recipeFolder).silent(true).pull((err, update) => {                                        
+                git(recipeFolder).pull((err, update) => {                                        
                     if (err) {
                         log.Error("ERROR pulling from git: " + JSON.stringify(err))
                     }                    
@@ -102,7 +102,7 @@ if (cluster.isMaster) {
             process.on('message', function (msg) {
                 if (msg && msg.MESSAGE && msg.MESSAGE === MESSAGE_UPDATEDREPO) {
                     let update = msg.Update
-                    srv.UpdateRecipies(update);
+                    srv.UpdateRecipes(update);
                 }
             })
 

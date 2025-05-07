@@ -1,6 +1,6 @@
 {
   "name": "cybersaucier",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "CyberSaucier is a wrapper around CyberChef to allow for programmatic use",
   "homepage": "https://github.com/dbheise/cybersaucier",
   "author": "David B Heise <david@heiseink.com> (https://dbheise.github.io)",
@@ -13,23 +13,32 @@
     "type": "git",
     "url": "https://github.com/dbheise/cybersaucier.git"
   },
+  "devDependencies": {
+    "eslint": "^9.0.0",
+    "mocha": "^10.0.0",
+    "nodemon": "^3.1.4",
+    "supertest": "^7.0.0"
+  },
   "dependencies": {
-    "@hapi/hapi": "^18.4.0",
-    "chalk": "^2.4.2",
-    "cyberchef": "9.12.0",
-    "hapi-pino": "^6.3.0",
+    "chalk": "^5.4.1",
+    "cookie-parser": "~1.4.4",
+    "cors": "^2.8.5",
+    "esm": "^3.2.25",
+    "express": "^4.19.2",
+    "hapi": "^18.1.0",
+    "hapi-pino": "^12.1.0",
+    "helmet": "^8.0.0",
     "inert": "^5.1.3",
-    "simple-git": "^1.126.0"
+    "pino-http": "^10.3.0",
+    "simple-git": "^3.27.0",
+    "swagger-ui-express": "^5.0.1",
+    "terser": "^5.31.1",
+    "yaml": "^2.5.0"
   },
   "main": "main.mjs",
   "scripts": {
-    "start": "node --experimental-modules main.mjs",
-    "test": "node --experimental-modules test.mjs"
-  },
-  "devDependencies": {
-    "commander": "^3.0.2",
-    "mocha": "^6.2.2",
-    "should": "^13.2.3",
-    "supertest": "^4.0.2"
+    "start": "node main.mjs",
+    "test": "node test.mjs",
+        "postinstall": "npm install cyberchef --no-save --ignore-scripts && node ./postinstall.js"
   }
 }

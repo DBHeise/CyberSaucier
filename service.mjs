@@ -3,13 +3,13 @@
 import fs from 'fs';
 const fsPromises = fs.promises;
 import path from 'path';
-import Hapi from '@hapi/hapi';
+import Hapi from 'hapi';
 import inert from 'inert';
 import pino from 'hapi-pino';
-import cChef from 'cyberchef/src/node/index';
+import { bake, Dish } from "cyberchef";
 import git from 'simple-git';
-import config from './config';
-import logger from './logger';
+import config from './config.mjs';
+import logger from './logger.mjs';
 const log = logger("service")
 
 class Service {
@@ -69,8 +69,8 @@ class Service {
         log.Info(`Server running at: ${this.server.info.uri}`);
     }
 
-    UpdateRecipies(updateBlob) {
-        log.Trace("Updating Recipies")
+    UpdateRecipes(updateBlob) {
+        log.Trace("Updating Recipes")
         let self = this
         try {
             const recipeFolder = path.resolve(self.cfg.RecipeFolder);        
@@ -82,7 +82,7 @@ class Service {
             }
             self.loadRecipes(recipeFolder)
         } catch (err) {
-            log.Error("Error occured while Updating Recipies: " + err);
+            log.Error(`Error occurred while Updating Recipes: ${err}`);
         }
     }
     //Default Route - static configured file
@@ -142,7 +142,7 @@ class Service {
     runCChefRecipe(input, recipe) {
         let dish = null
         try { 
-            dish = cChef.bake(input, recipe.recipe)
+            dish = bake(input, recipe.recipe)
         } catch (e) {
             dish = { error: {message: e.message, type: e.type, code: e.code, stack: e.stack.split('\n') }}
         }
@@ -210,7 +210,7 @@ class Service {
     }
 
     removeRecipe(fullPath) {
-        log.Trace("Removing Recipie:" + fullPath);
+        log.Trace("Removing Recipe:" + fullPath);
         let name = this.fileMap[fullPath]
         delete this.list[name];
     }
@@ -236,7 +236,7 @@ class Service {
                 const f = fs.statSync(fullPath)
                 if (f.isDirectory()) {
                     await self.loadRecipes(fullPath).catch(err => {
-                        log.Error("Error while loading recipies:" + err)
+                        log.Error("Error while loading recipes:" + err)
                     })
                 } else {
                     if (names[i].endsWith(".json")) {
@@ -245,7 +245,7 @@ class Service {
                 }
             }
         } catch (err) {
-            log.Error("Error occured while loading recipies: " + err);
+            log.Error("Error occurred while loading recipes: " + err);
         }
     }
 
@@ -258,14 +258,14 @@ class Service {
         } catch (err) {
             //if the repo does not exist, clone it now
             log.Info(`Setting up sparse checkout locally: ${localFolder}`)
-            await git('.').silent(true).clone(remoteGit, localFolder, ["--no-checkout"])
+            await git('.').clone(remoteGit, localFolder, ["--no-checkout"])
             let g = git(localFolder)
             g.addConfig("core.sparsecheckout", "true")
             fs.writeFileSync(path.join(localFolder, ".git/info/sparse-checkout"), sparseFolder)
         }
 
-        log.Info(`Checkingout Latest`)
-        await git(localFolder).silent(true).checkout("--")
+        log.Info(`Checking out Latest`)
+        await git(localFolder).checkout("--")
     }
 
     async setupFullRepo(localFolder, remoteGit) {
@@ -276,11 +276,11 @@ class Service {
         } catch (err) {
             //if the repo does not exist, clone it now
             log.Info(`Cloning repo locally: ${localFolder}`)
-            await git('.').silent(true).clone(remoteGit, localFolder);
+            await git('.').clone(remoteGit, localFolder);
         }
 
         log.Info(`Pulling Latest`)
-        await git(localFolder).silent(true).pull()
+        await git(localFolder).pull()
     }
 
 }
