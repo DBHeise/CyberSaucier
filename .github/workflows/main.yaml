@@ -77,6 +77,6 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          tags: "${{ vars.DOCKERHUB_USERNAME }}/test:${{ needs.version.outputs.newtag }},${{ vars.DOCKERHUB_USERNAME }}/test:latest"
+          tags: "${{ vars.DOCKERHUB_USERNAME }}/${{ vars.DOCKERHUB_PROJECTNAME }}:${{ needs.version.outputs.newtag }},${{ vars.DOCKERHUB_USERNAME }}/${{ vars.DOCKERHUB_PROJECTNAME }}:latest"
           push: true
 
